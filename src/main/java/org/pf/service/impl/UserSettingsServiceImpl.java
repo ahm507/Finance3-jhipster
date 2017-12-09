@@ -1,9 +1,12 @@
 package org.pf.service.impl;
 
-import org.pf.service.UserSettingsService;
+import org.pf.domain.User;
 import org.pf.domain.UserSettings;
+import org.pf.repository.UserRepository;
 import org.pf.repository.UserSettingsRepository;
 import org.pf.repository.search.UserSettingsSearchRepository;
+import org.pf.security.SecurityUtils;
+import org.pf.service.UserSettingsService;
 import org.pf.service.dto.UserSettingsDTO;
 import org.pf.service.mapper.UserSettingsMapper;
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -33,10 +37,23 @@ public class UserSettingsServiceImpl implements UserSettingsService{
 
     private final UserSettingsSearchRepository userSettingsSearchRepository;
 
-    public UserSettingsServiceImpl(UserSettingsRepository userSettingsRepository, UserSettingsMapper userSettingsMapper, UserSettingsSearchRepository userSettingsSearchRepository) {
+    private final UserRepository userRepository;
+
+
+    public UserSettingsServiceImpl(UserSettingsRepository userSettingsRepository, UserSettingsMapper userSettingsMapper,
+        UserSettingsSearchRepository userSettingsSearchRepository,
+        UserRepository userRepository) {
         this.userSettingsRepository = userSettingsRepository;
         this.userSettingsMapper = userSettingsMapper;
         this.userSettingsSearchRepository = userSettingsSearchRepository;
+        this.userRepository = userRepository;
+    }
+
+    private void enforceSavingToCurrentUser(UserSettingsDTO userSettingsDTO) {
+        Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        userSettingsDTO.setUserLogin(login.get());
+        Optional<User> user = userRepository.findOneByLogin(login.get());
+        userSettingsDTO.setUserId(user.get().getId());
     }
 
     /**
@@ -48,6 +65,9 @@ public class UserSettingsServiceImpl implements UserSettingsService{
     @Override
     public UserSettingsDTO save(UserSettingsDTO userSettingsDTO) {
         log.debug("Request to save UserSettings : {}", userSettingsDTO);
+
+        enforceSavingToCurrentUser(userSettingsDTO);
+
         UserSettings userSettings = userSettingsMapper.toEntity(userSettingsDTO);
         userSettings = userSettingsRepository.save(userSettings);
         UserSettingsDTO result = userSettingsMapper.toDto(userSettings);

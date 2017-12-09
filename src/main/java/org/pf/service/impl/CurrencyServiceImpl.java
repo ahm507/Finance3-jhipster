@@ -1,9 +1,12 @@
 package org.pf.service.impl;
 
-import org.pf.service.CurrencyService;
 import org.pf.domain.Currency;
+import org.pf.domain.User;
 import org.pf.repository.CurrencyRepository;
+import org.pf.repository.UserRepository;
 import org.pf.repository.search.CurrencySearchRepository;
+import org.pf.security.SecurityUtils;
+import org.pf.service.CurrencyService;
 import org.pf.service.dto.CurrencyDTO;
 import org.pf.service.mapper.CurrencyMapper;
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -33,10 +37,14 @@ public class CurrencyServiceImpl implements CurrencyService{
 
     private final CurrencySearchRepository currencySearchRepository;
 
-    public CurrencyServiceImpl(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper, CurrencySearchRepository currencySearchRepository) {
+    private final UserRepository userRepository;
+
+    public CurrencyServiceImpl(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper,
+        UserRepository userRepository, CurrencySearchRepository currencySearchRepository) {
         this.currencyRepository = currencyRepository;
         this.currencyMapper = currencyMapper;
         this.currencySearchRepository = currencySearchRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -48,12 +56,22 @@ public class CurrencyServiceImpl implements CurrencyService{
     @Override
     public CurrencyDTO save(CurrencyDTO currencyDTO) {
         log.debug("Request to save Currency : {}", currencyDTO);
+
+        enforceSavingToCurrentUser(currencyDTO);
         Currency currency = currencyMapper.toEntity(currencyDTO);
         currency = currencyRepository.save(currency);
         CurrencyDTO result = currencyMapper.toDto(currency);
         currencySearchRepository.save(currency);
         return result;
     }
+
+    private void enforceSavingToCurrentUser(CurrencyDTO currencyDTO) {
+        Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        currencyDTO.setUserLogin(login.get());
+        Optional<User> user = userRepository.findOneByLogin(login.get());
+        currencyDTO.setUserId(user.get().getId());
+    }
+
 
     /**
      * Get all the currencies.

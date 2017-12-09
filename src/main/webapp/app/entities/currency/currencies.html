@@ -37,7 +37,7 @@
                 <tr>
                     <th><span data-translate="global.field.id">ID</span></th>
                     <th><span data-translate="financeApp.currency.name">Name</span></th>
-                    <th><span data-translate="financeApp.currency.user">User</span></th>
+                    <!--<th><span data-translate="financeApp.currency.user">User</span></th>-->
                     <th></th>
                 </tr>
             </thead>
@@ -45,9 +45,9 @@
                 <tr ng-repeat="currency in vm.currencies track by currency.id">
                     <td><a ui-sref="currency-detail({id:currency.id})">{{currency.id}}</a></td>
                     <td>{{currency.name}}</td>
-                    <td>
-                        {{currency.userLogin}}
-                    </td>
+                    <!--<td>-->
+                        <!--{{currency.userLogin}}-->
+                    <!--</td>-->
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <button type="submit"

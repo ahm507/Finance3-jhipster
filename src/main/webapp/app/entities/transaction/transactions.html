@@ -39,7 +39,7 @@
                     <th jh-sort-by="date"><span data-translate="financeApp.transaction.date">Date</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="amount"><span data-translate="financeApp.transaction.amount">Amount</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="description"><span data-translate="financeApp.transaction.description">Description</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="userLogin"><span data-translate="financeApp.transaction.user">User</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <!--<th jh-sort-by="userLogin"><span data-translate="financeApp.transaction.user">User</span> <span class="glyphicon glyphicon-sort"></span></th>-->
                     <th jh-sort-by="withdrawAccountText"><span data-translate="financeApp.transaction.withdrawAccount">Withdraw Account</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="depositAccountText"><span data-translate="financeApp.transaction.depositAccount">Deposit Account</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
@@ -51,9 +51,9 @@
                     <td>{{transaction.date | date:'medium'}}</td>
                     <td>{{transaction.amount}}</td>
                     <td>{{transaction.description}}</td>
-                    <td>
-                        {{transaction.userLogin}}
-                    </td>
+                    <!--<td>-->
+                        <!--{{transaction.userLogin}}-->
+                    <!--</td>-->
                     <td>
                         <a ui-sref="user-account-detail({id:transaction.withdrawAccountId})">{{transaction.withdrawAccountText}}</a>
                     </td>

@@ -1,9 +1,12 @@
 package org.pf.service.impl;
 
-import org.pf.service.UserAccountService;
+import org.pf.domain.User;
 import org.pf.domain.UserAccount;
 import org.pf.repository.UserAccountRepository;
+import org.pf.repository.UserRepository;
 import org.pf.repository.search.UserAccountSearchRepository;
+import org.pf.security.SecurityUtils;
+import org.pf.service.UserAccountService;
 import org.pf.service.dto.UserAccountDTO;
 import org.pf.service.mapper.UserAccountMapper;
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -31,10 +35,23 @@ public class UserAccountServiceImpl implements UserAccountService{
 
     private final UserAccountSearchRepository userAccountSearchRepository;
 
-    public UserAccountServiceImpl(UserAccountRepository userAccountRepository, UserAccountMapper userAccountMapper, UserAccountSearchRepository userAccountSearchRepository) {
+    private final UserRepository userRepository;
+
+    public UserAccountServiceImpl(UserAccountRepository userAccountRepository, UserAccountMapper userAccountMapper,
+        UserAccountSearchRepository userAccountSearchRepository,
+        UserRepository userRepository) {
         this.userAccountRepository = userAccountRepository;
         this.userAccountMapper = userAccountMapper;
         this.userAccountSearchRepository = userAccountSearchRepository;
+        this.userRepository = userRepository;
+    }
+
+
+    private void enforceSavingToCurrentUser(UserAccountDTO userAccountDTO) {
+        Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        userAccountDTO.setUserLogin(login.get());
+        Optional<User> user = userRepository.findOneByLogin(login.get());
+        userAccountDTO.setUserId(user.get().getId());
     }
 
     /**
@@ -46,6 +63,7 @@ public class UserAccountServiceImpl implements UserAccountService{
     @Override
     public UserAccountDTO save(UserAccountDTO userAccountDTO) {
         log.debug("Request to save UserAccount : {}", userAccountDTO);
+        enforceSavingToCurrentUser(userAccountDTO);
         UserAccount userAccount = userAccountMapper.toEntity(userAccountDTO);
         userAccount = userAccountRepository.save(userAccount);
         UserAccountDTO result = userAccountMapper.toDto(userAccount);

@@ -1,9 +1,12 @@
 package org.pf.service.impl;
 
-import org.pf.service.TransactionService;
 import org.pf.domain.Transaction;
+import org.pf.domain.User;
 import org.pf.repository.TransactionRepository;
+import org.pf.repository.UserRepository;
 import org.pf.repository.search.TransactionSearchRepository;
+import org.pf.security.SecurityUtils;
+import org.pf.service.TransactionService;
 import org.pf.service.dto.TransactionDTO;
 import org.pf.service.mapper.TransactionMapper;
 import org.slf4j.Logger;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -31,10 +35,15 @@ public class TransactionServiceImpl implements TransactionService{
 
     private final TransactionSearchRepository transactionSearchRepository;
 
-    public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper, TransactionSearchRepository transactionSearchRepository) {
+    private final UserRepository userRepository;
+
+    public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper,
+        TransactionSearchRepository transactionSearchRepository,
+        UserRepository userRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.transactionSearchRepository = transactionSearchRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -46,11 +55,21 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransactionDTO save(TransactionDTO transactionDTO) {
         log.debug("Request to save Transaction : {}", transactionDTO);
+
+        enforceSavingToCurrentUser(transactionDTO);
+
         Transaction transaction = transactionMapper.toEntity(transactionDTO);
         transaction = transactionRepository.save(transaction);
         TransactionDTO result = transactionMapper.toDto(transaction);
         transactionSearchRepository.save(transaction);
         return result;
+    }
+
+    private void enforceSavingToCurrentUser(TransactionDTO transactionDTO) {
+        Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        transactionDTO.setUserLogin(login.get());
+        Optional<User> user = userRepository.findOneByLogin(login.get());
+        transactionDTO.setUserId(user.get().getId());
     }
 
     /**
