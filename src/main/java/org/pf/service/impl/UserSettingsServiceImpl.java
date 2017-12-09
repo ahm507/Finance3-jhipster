@@ -69,6 +69,14 @@ public class UserSettingsServiceImpl implements UserSettingsService{
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    public List<UserSettingsDTO> findAllByCurrentUser() {
+        log.debug("Request to get all UserSettings");
+        return userSettingsRepository.findAllByCurrentUser().stream()
+            .map(userSettingsMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+
     /**
      * Get one userSettings by id.
      *
