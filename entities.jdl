@@ -1,0 +1,42 @@
+
+
+entity UserSettings {
+	usdRate Double required,
+    sarRate Double required
+}
+
+enum AccountType {
+    ASSET, EXPENSE, INCOME, LIABILITY, OTHER
+}
+
+enum Currency {
+    USD, EGP, MYR
+}
+
+entity UserAccount {
+		text String required maxlength(100) minlength(3),
+        description String maxlength(255),
+        type AccountType required,
+        currency Currency required
+}
+
+entity Transaction {
+    date ZonedDateTime required,
+    amount Double required,
+    description String maxlength(100)
+}
+
+relationship OneToOne {
+	UserSettings{user(login)} to User
+}
+
+relationship ManyToOne {
+	UserAccount{user(login)} to User,
+    Transaction{user(login)} to User
+}
+
+relationship ManyToOne {
+    //entityName{fieldToBeUsed(FieldToDisplayFrom the target entity)} to ...
+    Transaction {withdrawAccount(text) required} to UserAccount,
+    Transaction {depositAccount(text) required} to UserAccount  
+}

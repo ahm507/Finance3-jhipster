@@ -1,0 +1,9 @@
+{
+    "activate": {
+        "title": "التفعيل",
+        "messages": {
+            "success": "<strong>تم تفعيل المستخدم الخاص بك.</strong> من فضلك <a class=\"alert-link\" href=\"\" ng-click=\"vm.login()\">تسجيل الدخول</a>.",
+            "error": "<strong>لا يمكن تنشيط المستخدم الخاص بك.</strong> يرجى استخدام نموذج التسجيل للاشتراك."
+        }
+    }
+}
