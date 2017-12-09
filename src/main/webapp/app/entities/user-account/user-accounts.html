@@ -45,7 +45,17 @@
                 </tr>
             </thead>
             <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
-                <tr ng-repeat="userAccount in vm.userAccounts track by userAccount.id">
+
+            <tr
+                ng-style="{
+                        'background-color': {INCOME: 'lightblue',
+                                            EXPENSE: 'LightPink',
+                                            ASSET: 'lightgreen',
+                                            LIABILITY: 'DarkSalmon',
+                                            OTHER: 'lightyellow'}[ userAccount.type ]
+                        }"
+
+                ng-repeat="userAccount in vm.userAccounts track by userAccount.id">
                     <td><a ui-sref="user-account-detail({id:userAccount.id})">{{userAccount.id}}</a></td>
                     <td>{{userAccount.text}}</td>
                     <td>{{userAccount.description}}</td>
