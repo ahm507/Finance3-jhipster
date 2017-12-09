@@ -9,15 +9,14 @@ enum AccountType {
     ASSET, EXPENSE, INCOME, LIABILITY, OTHER
 }
 
-enum Currency {
-    USD, EGP, MYR
+entity Currency {
+    name String required maxlength(3) minlength(3)
 }
 
 entity UserAccount {
 		text String required maxlength(100) minlength(3),
         description String maxlength(255),
         type AccountType required,
-        currency Currency required
 }
 
 entity Transaction {
@@ -27,16 +26,26 @@ entity Transaction {
 }
 
 relationship OneToOne {
-	UserSettings{user(login)} to User
+	UserSettings{user(login) required} to User
 }
 
-relationship ManyToOne {
-	UserAccount{user(login)} to User,
-    Transaction{user(login)} to User
-}
 
 relationship ManyToOne {
-    //entityName{fieldToBeUsed(FieldToDisplayFrom the target entity)} to ...
+	UserAccount{user(login) required} to User,
+    Transaction{user(login) required} to User,
+    Currency   {user(login) required} to User,
+    UserAccount{currency(name) required} to Currency
+}
+
+
+relationship ManyToOne {
     Transaction {withdrawAccount(text) required} to UserAccount,
-    Transaction {depositAccount(text) required} to UserAccount  
+    Transaction {depositAccount(text) required} to UserAccount
 }
+
+paginate UserAccount with infinite-scroll
+paginate Transaction with infinite-scroll
+
+service * with serviceImpl
+dto * with mapstruct
+
