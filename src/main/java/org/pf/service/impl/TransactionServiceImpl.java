@@ -68,6 +68,20 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     /**
+     * Get all the transactions.
+     *
+     * @param pageable the pagination information
+     * @return the list of entities
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<TransactionDTO> findAllByCurrentUser(Pageable pageable) {
+        log.debug("Request to get all Transactions");
+        return transactionRepository.findByUserIsCurrentUser(pageable)
+            .map(transactionMapper::toDto);
+    }
+
+    /**
      * Get one transaction by id.
      *
      * @param id the id of the entity

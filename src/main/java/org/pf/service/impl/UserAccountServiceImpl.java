@@ -107,4 +107,18 @@ public class UserAccountServiceImpl implements UserAccountService{
         Page<UserAccount> result = userAccountSearchRepository.search(queryStringQuery(query), pageable);
         return result.map(userAccountMapper::toDto);
     }
+
+    /**
+     * Get all the userAccounts of current user.
+     *
+     * @param pageable the pagination information
+     * @return the list of entities
+     */
+    @Override
+    @Transactional(readOnly = true)    public Page<UserAccountDTO> findByCurrentUser(Pageable pageable) {
+        log.debug("Request to get all UserAccounts of current logged in user");
+        return userAccountRepository.findByUserIsCurrentUser(pageable)
+            .map(userAccountMapper::toDto);
+    }
+
 }

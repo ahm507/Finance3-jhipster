@@ -69,6 +69,14 @@ public class CurrencyServiceImpl implements CurrencyService{
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
+
+    public List<CurrencyDTO> findAllByCurrentUser() {
+        log.debug("Request to get all Currencies");
+        return currencyRepository.findByUserIsCurrentUser().stream()
+            .map(currencyMapper::toDto)
+            .collect(Collectors.toCollection(LinkedList::new));
+    }
+
     /**
      * Get one currency by id.
      *

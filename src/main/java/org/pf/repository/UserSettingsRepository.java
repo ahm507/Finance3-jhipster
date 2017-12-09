@@ -1,10 +1,11 @@
 package org.pf.repository;
 
 import org.pf.domain.UserSettings;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import org.springframework.data.jpa.repository.*;
-
+import java.util.List;
 
 /**
  * Spring Data JPA repository for the UserSettings entity.
@@ -13,4 +14,6 @@ import org.springframework.data.jpa.repository.*;
 @Repository
 public interface UserSettingsRepository extends JpaRepository<UserSettings, Long> {
 
+    @Query("select user_settings from UserSettings user_settings where user_settings.user.login = ?#{principal.username}")
+    List<UserSettings> findAllByCurrentUser();
 }
