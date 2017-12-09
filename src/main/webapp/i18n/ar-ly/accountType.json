@@ -1,0 +1,12 @@
+{
+    "financeApp": {
+        "AccountType" : {
+            "null": "",
+            "ASSET": "ASSET",
+            "EXPENSE": "EXPENSE",
+            "INCOME": "INCOME",
+            "LIABILITY": "LIABILITY",
+            "OTHER": "OTHER"
+        }
+    }
+}

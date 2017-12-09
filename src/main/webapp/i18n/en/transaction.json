@@ -1,0 +1,27 @@
+{
+    "financeApp": {
+        "transaction" : {
+            "home": {
+                "title": "Transactions",
+                "createLabel": "Create a new Transaction",
+                "createOrEditLabel": "Create or edit a Transaction",
+                "search": "Search for Transaction"
+            },
+            "created": "A new Transaction is created with identifier {{ param }}",
+            "updated": "A Transaction is updated with identifier {{ param }}",
+            "deleted": "A Transaction is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Transaction {{ id }}?"
+            },
+            "detail": {
+                "title": "Transaction"
+            },
+            "date": "Date",
+            "amount": "Amount",
+            "description": "Description",
+            "user": "User",
+            "withdrawAccount": "Withdraw Account",
+            "depositAccount": "Deposit Account"
+        }
+    }
+}

@@ -1,0 +1,107 @@
+
+<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
+                ng-click="vm.clear()">&times;</button>
+        <h4 class="modal-title" id="myTransactionLabel" data-translate="financeApp.transaction.home.createOrEditLabel">Create or edit a Transaction</h4>
+    </div>
+    <div class="modal-body">
+        <jhi-alert-error></jhi-alert-error>
+        <div class="form-group" ng-show="vm.transaction.id">
+            <label for="id" data-translate="global.field.id">ID</label>
+            <input type="text" class="form-control" id="id" name="id"
+                    ng-model="vm.transaction.id" readonly />
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="financeApp.transaction.date" for="field_date">Date</label>
+                <div class="input-group">
+                    <input id="field_date" type="text" class="form-control" name="date" datetime-picker="{{dateformat}}" ng-model="vm.transaction.date" is-open="vm.datePickerOpenStatus.date"
+                    required/>
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" ng-click="vm.openCalendar('date')"><i class="glyphicon glyphicon-calendar"></i></button>
+                    </span>
+                </div>
+            <div ng-show="editForm.date.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.date.$error.required" data-translate="entity.validation.required">
+                    This field is required.
+                </p>
+                <p class="help-block"
+                    ng-show="editForm.date.$error.ZonedDateTimelocal" data-translate="entity.validation.ZonedDateTimelocal">
+                    This field should be a date and time.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="financeApp.transaction.amount" for="field_amount">Amount</label>
+            <input type="number" class="form-control" name="amount" id="field_amount"
+                    ng-model="vm.transaction.amount"
+                    required/>
+            <div ng-show="editForm.amount.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.amount.$error.required" data-translate="entity.validation.required">
+                    This field is required.
+                </p>
+                <p class="help-block"
+                    ng-show="editForm.amount.$error.number" data-translate="entity.validation.number">
+                    This field should be a number.
+                </p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="financeApp.transaction.description" for="field_description">Description</label>
+            <input type="text" class="form-control" name="description" id="field_description"
+                    ng-model="vm.transaction.description"
+                    ng-maxlength="100"/>
+            <div ng-show="editForm.description.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.description.$error.maxlength" data-translate="entity.validation.maxlength" translate-value-max="100">
+                    This field cannot be longer than 100 characters.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label data-translate="financeApp.transaction.user" for="field_user">User</label>
+            <select class="form-control" id="field_user" name="user" ng-model="vm.transaction.userId" ng-options="user.id as user.login for user in vm.users"             required>
+            </select>
+        </div>
+        <div ng-show="editForm.user.$invalid">
+            <p class="help-block"
+                ng-show="editForm.user.$error.required" data-translate="entity.validation.required">
+                This field is required.
+            </p>
+        </div>
+        <div class="form-group">
+            <label data-translate="financeApp.transaction.withdrawAccount" for="field_withdrawAccount">Withdraw Account</label>
+            <select class="form-control" id="field_withdrawAccount" name="withdrawAccount" ng-model="vm.transaction.withdrawAccountId" ng-options="userAccount.id as userAccount.text for userAccount in vm.useraccounts"             required>
+            </select>
+        </div>
+        <div ng-show="editForm.withdrawAccount.$invalid">
+            <p class="help-block"
+                ng-show="editForm.withdrawAccount.$error.required" data-translate="entity.validation.required">
+                This field is required.
+            </p>
+        </div>
+        <div class="form-group">
+            <label data-translate="financeApp.transaction.depositAccount" for="field_depositAccount">Deposit Account</label>
+            <select class="form-control" id="field_depositAccount" name="depositAccount" ng-model="vm.transaction.depositAccountId" ng-options="userAccount.id as userAccount.text for userAccount in vm.useraccounts"             required>
+            </select>
+        </div>
+        <div ng-show="editForm.depositAccount.$invalid">
+            <p class="help-block"
+                ng-show="editForm.depositAccount.$error.required" data-translate="entity.validation.required">
+                This field is required.
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">
+            <span class="glyphicon glyphicon-ban-circle"></span>&nbsp;<span data-translate="entity.action.cancel">Cancel</span>
+        </button>
+        <button type="submit" ng-disabled="editForm.$invalid || vm.isSaving" class="btn btn-primary">
+            <span class="glyphicon glyphicon-save"></span>&nbsp;<span data-translate="entity.action.save">Save</span>
+        </button>
+    </div>
+</form>

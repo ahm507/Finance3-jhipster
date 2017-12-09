@@ -1,0 +1,85 @@
+<div>
+    <h2 data-translate="financeApp.userAccount.home.title">User Accounts</h2>
+    <jhi-alert></jhi-alert>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4 no-padding-left">
+                <button class="btn btn-primary" ui-sref="user-account.new" >
+                    <span class="glyphicon glyphicon-plus"></span>
+                    <span class="hidden-xs-down"  data-translate="financeApp.userAccount.home.createLabel">
+                        Create new User Account
+                    </span>
+                </button>
+            </div>
+            <div class="col-xs-8 no-padding-right">
+                <form name="searchForm" class="form-inline">
+                    <div class="input-group pull-right" >
+                        <input type="text" class="form-control" ng-model="vm.searchQuery" id="searchQuery" placeholder="{{ 'financeApp.userAccount.home.search' | translate }}">
+                        <span  class="input-group-btn width-min" >
+                            <button class="btn btn-info" ng-click="vm.search(vm.searchQuery)">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                        <span class="input-group-btn width-min" ng-if="vm.currentSearch">
+                            <button class="btn btn-info" ng-click="vm.clear()">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="table-responsive">
+        <table class="jh-table table table-striped">
+            <thead>
+                <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
+                    <th jh-sort-by="id"><span data-translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="text"><span data-translate="financeApp.userAccount.text">Text</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="description"><span data-translate="financeApp.userAccount.description">Description</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="type"><span data-translate="financeApp.userAccount.type">Type</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="userLogin"><span data-translate="financeApp.userAccount.user">User</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="currencyName"><span data-translate="financeApp.userAccount.currency">Currency</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody infinite-scroll="vm.loadPage(vm.page + 1)" infinite-scroll-disabled="vm.page >= vm.links['last']">
+                <tr ng-repeat="userAccount in vm.userAccounts track by userAccount.id">
+                    <td><a ui-sref="user-account-detail({id:userAccount.id})">{{userAccount.id}}</a></td>
+                    <td>{{userAccount.text}}</td>
+                    <td>{{userAccount.description}}</td>
+                    <td data-translate="{{'financeApp.AccountType.' + userAccount.type}}">{{userAccount.type}}</td>
+                    <td>
+                        {{userAccount.userLogin}}
+                    </td>
+                    <td>
+                        <a ui-sref="currency-detail({id:userAccount.currencyId})">{{userAccount.currencyName}}</a>
+                    </td>
+                    <td class="text-right">
+                        <div class="btn-group flex-btn-group-container">
+                            <button type="submit"
+                                    ui-sref="user-account-detail({id:userAccount.id})"
+                                    class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-eye-open"></span>
+                                <span class="hidden-sm-down" data-translate="entity.action.view"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="user-account.edit({id:userAccount.id})"
+                                    class="btn btn-primary btn-sm">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                                <span class="hidden-sm-down" data-translate="entity.action.edit"></span>
+                            </button>
+                            <button type="submit"
+                                    ui-sref="user-account.delete({id:userAccount.id})"
+                                    class="btn btn-danger btn-sm">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                                <span class="hidden-sm-down" data-translate="entity.action.delete"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

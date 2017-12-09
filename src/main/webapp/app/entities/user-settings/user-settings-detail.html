@@ -1,0 +1,31 @@
+
+<div>
+    <h2><span data-translate="financeApp.userSettings.detail.title">User Settings</span> {{vm.userSettings.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="financeApp.userSettings.usdRate">Usd Rate</span></dt>
+        <dd>
+            <span>{{vm.userSettings.usdRate}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.userSettings.sarRate">Sar Rate</span></dt>
+        <dd>
+            <span>{{vm.userSettings.sarRate}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.userSettings.user">User</span></dt>
+        <dd>
+            {{vm.userSettings.userLogin}}
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="user-settings-detail.edit({id:vm.userSettings.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

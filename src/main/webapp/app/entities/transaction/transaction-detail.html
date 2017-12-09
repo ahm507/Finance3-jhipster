@@ -1,0 +1,43 @@
+
+<div>
+    <h2><span data-translate="financeApp.transaction.detail.title">Transaction</span> {{vm.transaction.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="financeApp.transaction.date">Date</span></dt>
+        <dd>
+            <span>{{vm.transaction.date | date:'medium'}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.transaction.amount">Amount</span></dt>
+        <dd>
+            <span>{{vm.transaction.amount}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.transaction.description">Description</span></dt>
+        <dd>
+            <span>{{vm.transaction.description}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.transaction.user">User</span></dt>
+        <dd>
+            {{vm.transaction.userLogin}}
+        </dd>
+        <dt><span data-translate="financeApp.transaction.withdrawAccount">Withdraw Account</span></dt>
+        <dd>
+            <a ui-sref="user-account-detail({id:vm.transaction.withdrawAccountId})">{{vm.transaction.withdrawAccountText}}</a>
+        </dd>
+        <dt><span data-translate="financeApp.transaction.depositAccount">Deposit Account</span></dt>
+        <dd>
+            <a ui-sref="user-account-detail({id:vm.transaction.depositAccountId})">{{vm.transaction.depositAccountText}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="transaction-detail.edit({id:vm.transaction.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>

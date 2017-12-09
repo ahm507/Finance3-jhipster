@@ -1,0 +1,39 @@
+
+<div>
+    <h2><span data-translate="financeApp.userAccount.detail.title">User Account</span> {{vm.userAccount.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="financeApp.userAccount.text">Text</span></dt>
+        <dd>
+            <span>{{vm.userAccount.text}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.userAccount.description">Description</span></dt>
+        <dd>
+            <span>{{vm.userAccount.description}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.userAccount.type">Type</span></dt>
+        <dd>
+            <span data-translate="{{'financeApp.AccountType.' + vm.userAccount.type}}">{{vm.userAccount.type}}</span>
+        </dd>
+        <dt><span data-translate="financeApp.userAccount.user">User</span></dt>
+        <dd>
+            {{vm.userAccount.userLogin}}
+        </dd>
+        <dt><span data-translate="financeApp.userAccount.currency">Currency</span></dt>
+        <dd>
+            <a ui-sref="currency-detail({id:vm.userAccount.currencyId})">{{vm.userAccount.currencyName}}</a>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="user-account-detail.edit({id:vm.userAccount.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>
