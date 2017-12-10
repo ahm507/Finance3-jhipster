@@ -17,7 +17,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 //    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username}")
 //    List<Transaction> findByUserIsCurrentUser();
 
-    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username}")
+    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username} order by date ASC")
 
     Page<Transaction> findByUserIsCurrentUser(Pageable pageable);
 
