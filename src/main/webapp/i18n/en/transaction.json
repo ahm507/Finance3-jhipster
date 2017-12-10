@@ -21,7 +21,8 @@
             "description": "Description",
             "user": "User",
             "withdrawAccount": "Withdraw Account",
-            "depositAccount": "Deposit Account"
+            "depositAccount": "Deposit Account",
+            "accountList": "Account List"
         }
     }
 }

@@ -5,9 +5,9 @@
         .module('financeApp')
         .controller('TransactionController', TransactionController);
 
-    TransactionController.$inject = ['Transaction', 'TransactionSearch', 'ParseLinks', 'AlertService', 'paginationConstants'];
+    TransactionController.$inject = ['Transaction', 'TransactionSearch', 'ParseLinks', 'AlertService', 'paginationConstants', 'UserAccount'];
 
-    function TransactionController(Transaction, TransactionSearch, ParseLinks, AlertService, paginationConstants) {
+    function TransactionController(Transaction, TransactionSearch, ParseLinks, AlertService, paginationConstants, UserAccount) {
 
         var vm = this;
 
@@ -24,6 +24,8 @@
         vm.clear = clear;
         vm.loadAll = loadAll;
         vm.search = search;
+
+        vm.useraccounts = UserAccount.query();
 
         loadAll();
 

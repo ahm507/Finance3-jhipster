@@ -31,17 +31,29 @@
         </div>
     </div>
     <br/>
+
+    <div class="form-group">
+        <label data-translate="financeApp.transaction.accountList" for="field_withdrawAccount">Account List</label>
+        <select class="form-control" id="field_withdrawAccount" name="withdrawAccount" 
+            ng-model="vm.useraccount.id" 
+            ng-options="userAccount.id as userAccount.text for userAccount in vm.useraccounts"
+            required>
+        </select>
+    </div>
+
+
     <div class="table-responsive">
         <table class="jh-table table table-striped">
             <thead>
                 <tr jh-sort="vm.predicate" ascending="vm.reverse" callback="vm.reset()">
                     <th jh-sort-by="id"><span data-translate="global.field.id">ID</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="date"><span data-translate="financeApp.transaction.date">Date</span> <span class="glyphicon glyphicon-sort"></span></th>
-                    <th jh-sort-by="amount"><span data-translate="financeApp.transaction.amount">Amount</span> <span class="glyphicon glyphicon-sort"></span></th>
+
                     <th jh-sort-by="description"><span data-translate="financeApp.transaction.description">Description</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <!--<th jh-sort-by="userLogin"><span data-translate="financeApp.transaction.user">User</span> <span class="glyphicon glyphicon-sort"></span></th>-->
                     <th jh-sort-by="withdrawAccountText"><span data-translate="financeApp.transaction.withdrawAccount">Withdraw Account</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th jh-sort-by="depositAccountText"><span data-translate="financeApp.transaction.depositAccount">Deposit Account</span> <span class="glyphicon glyphicon-sort"></span></th>
+                    <th jh-sort-by="amount"><span data-translate="financeApp.transaction.amount">Amount</span> <span class="glyphicon glyphicon-sort"></span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -49,7 +61,6 @@
                 <tr ng-repeat="transaction in vm.transactions track by transaction.id">
                     <td><a ui-sref="transaction-detail({id:transaction.id})">{{transaction.id}}</a></td>
                     <td>{{transaction.date | date:'medium'}}</td>
-                    <td>{{transaction.amount}}</td>
                     <td>{{transaction.description}}</td>
                     <!--<td>-->
                         <!--{{transaction.userLogin}}-->
@@ -60,14 +71,16 @@
                     <td>
                         <a ui-sref="user-account-detail({id:transaction.depositAccountId})">{{transaction.depositAccountText}}</a>
                     </td>
+                    <td>{{transaction.amount}}</td>
+
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
-                            <button type="submit"
-                                    ui-sref="transaction-detail({id:transaction.id})"
-                                    class="btn btn-info btn-sm">
-                                <span class="glyphicon glyphicon-eye-open"></span>
-                                <span class="hidden-sm-down" data-translate="entity.action.view"></span>
-                            </button>
+                            <!--<button type="submit"-->
+                                    <!--ui-sref="transaction-detail({id:transaction.id})"-->
+                                    <!--class="btn btn-info btn-sm">-->
+                                <!--<span class="glyphicon glyphicon-eye-open"></span>-->
+                                <!--<span class="hidden-sm-down" data-translate="entity.action.view"></span>-->
+                            <!--</button>-->
                             <button type="submit"
                                     ui-sref="transaction.edit({id:transaction.id})"
                                     class="btn btn-primary btn-sm">
