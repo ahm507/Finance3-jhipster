@@ -25,7 +25,12 @@
         vm.loadAll = loadAll;
         vm.search = search;
 
-        vm.useraccounts = UserAccount.query();
+        vm.useraccounts = UserAccount.query({}, onSuccess);
+        function onSuccess(data) {
+            data.forEach(function (element) {
+                element.path = element.type + ' > ' + element.text + ' - ' + element.currencyName;
+            });
+        }
 
         loadAll();
 
