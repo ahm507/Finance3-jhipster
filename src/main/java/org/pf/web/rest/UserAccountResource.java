@@ -61,6 +61,11 @@ public class UserAccountResource {
         if (userAccountDTO.getId() != null) {
             throw new BadRequestAlertException("A new userAccount cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        if(userAccountService.isDuplicateName(userAccountDTO.getText())) {
+            throw new BadRequestAlertException("Duplicate account name ", ENTITY_NAME, "value.duplicate");
+        }
+
         UserAccountDTO result = userAccountService.save(userAccountDTO);
         return ResponseEntity.created(new URI("/api/user-accounts/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))

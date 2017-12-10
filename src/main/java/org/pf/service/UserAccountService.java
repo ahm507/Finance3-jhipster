@@ -51,4 +51,7 @@ public interface UserAccountService {
     Page<UserAccountDTO> search(String query, Pageable pageable);
 
     Page<UserAccountDTO> findByCurrentUser(Pageable pageable);
+
+    public boolean isDuplicateName(String accountText) ;
+
 }

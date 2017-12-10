@@ -14,10 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserAccountRepository extends JpaRepository<UserAccount, Long> {
 
-//    @Query("select user_account from UserAccount user_account where user_account.user.login = ?#{principal.username}")
-//    List<UserAccount> findByUserIsCurrentUser();
-
     @Query("select user_account from UserAccount user_account where user_account.user.login = ?#{principal.username} order by type ASC")
     Page<UserAccount> findByUserIsCurrentUser(Pageable pageable);
 
+    long countByUser_IdAndText(Long id, String text);
 }

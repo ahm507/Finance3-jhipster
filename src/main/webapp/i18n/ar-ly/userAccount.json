@@ -16,7 +16,7 @@
             "detail": {
                 "title": "User Account"
             },
-            "text": "Text",
+            "text": "Title (Distinct)",
             "description": "Description",
             "type": "Type",
             "user": "User",
