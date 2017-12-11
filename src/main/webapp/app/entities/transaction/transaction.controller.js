@@ -25,6 +25,10 @@
         vm.loadAll = loadAll;
         vm.search = search;
 
+        vm.changeUserAccount = changeUserAccount;
+
+
+        //Add decorated UserAccount "path" property
         vm.useraccounts = UserAccount.query({}, onSuccess);
         function onSuccess(data) {
             data.forEach(function (element) {
@@ -33,6 +37,10 @@
         }
 
         loadAll();
+
+        function changeUserAccount() {
+            alert("changed " + vm.userAccount.id);
+        }
 
         function loadAll () {
             if (vm.currentSearch) {

@@ -35,8 +35,9 @@
     <div class="form-group">
         <label data-translate="financeApp.transaction.accountList" for="field_withdrawAccount">Account List</label>
         <select class="form-control" id="field_withdrawAccount" name="withdrawAccount" 
-            ng-model="vm.useraccount.id" 
+            ng-model="vm.userAccount.id" 
             ng-options="userAccount.id as userAccount.path for userAccount in vm.useraccounts"
+            ng-change="vm.changeUserAccount()"
             required>
         </select>
     </div>

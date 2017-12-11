@@ -25,6 +25,8 @@ public interface TransactionService {
      */
     Page<TransactionDTO> findAll(Pageable pageable);
 
+    public Page<TransactionDTO> findByUserIsCurrentUserAndUserIdAccountId(long userAccountId, Pageable pageable) ;
+
     /**
      * Get the "id" transaction.
      *

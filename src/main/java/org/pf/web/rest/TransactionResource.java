@@ -95,11 +95,34 @@ public class TransactionResource {
      * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of transactions in body
      */
+//    @GetMapping("/transactions")
+//    @Timed
+//    public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable) {
+//        log.debug("REST request to get a page of Transactions");
+//        Page<TransactionDTO> page = transactionService.findAllByCurrentUser(pageable);
+//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
+//        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+//    }
+
+
+    /**
+     * GET  /transactions : get all the transactions.
+     *
+     * @param pageable the pagination information
+     * @return the ResponseEntity with status 200 (OK) and the list of transactions in body
+     */
     @GetMapping("/transactions")
     @Timed
-    public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable) {
+    public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable,
+        @RequestParam(required = false, value = "userAccountId") Long userAccountId) {
         log.debug("REST request to get a page of Transactions");
-        Page<TransactionDTO> page = transactionService.findAllByCurrentUser(pageable);
+
+        Page<TransactionDTO> page;
+        if(userAccountId != null) {
+            page = transactionService.findByUserIsCurrentUserAndUserIdAccountId(userAccountId, pageable);
+        } else {
+            page = transactionService.findAllByCurrentUser(pageable);
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
