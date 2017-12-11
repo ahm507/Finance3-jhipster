@@ -77,13 +77,16 @@ public class UserAccountServiceImpl implements UserAccountService{
 
     /**
      * Check if an account text (title) already exist in database.
+     * @param login logged in user
      * @param accountText text/title to be checked
      * @return already exist or not
      */
-    public boolean isDuplicateName(String accountText) {
+    public boolean isDuplicateName(String login, String accountText) {
         //Get User Credentials
-        Optional<String> login = SecurityUtils.getCurrentUserLogin();
-        Optional<User> user = userRepository.findOneByLogin(login.get());
+//        if(login == null) { //WEB ONLY- NOT TEST CASES.
+//            login = SecurityUtils.getCurrentUserLogin().get();
+//        }
+        Optional<User> user = userRepository.findOneByLogin(login);
         long accountsCount = userAccountRepository.countByUser_IdAndText(user.get().getId(), accountText);
         return ( accountsCount > 0)? true: false;
     }
