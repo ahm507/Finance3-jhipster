@@ -172,17 +172,32 @@ public class CurrencyResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllCurrencies() throws Exception {
+    public void getAllCurrenciesOfUser() throws Exception {
         // Initialize the database
         currencyRepository.saveAndFlush(currency);
 
         // Get all the currencyList
-        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc"))
+        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc&login="+ currency.getUser().getLogin()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
     }
+
+//    @Test
+//    @Transactional
+//    public void getCurrenciesOfUser() throws Exception {
+//        // Initialize the database
+//        currencyRepository.saveAndFlush(currency);
+//
+//        // Get all the currencyList
+//        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc&userid=" + currency.getUser().getId()))
+//            .andExpect(status().isOk())
+//            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+//            .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))
+//            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+//    }
+
 
     @Test
     @Transactional

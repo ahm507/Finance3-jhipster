@@ -1,21 +1,20 @@
 package org.pf.web.rest;
 
-import org.pf.FinanceApp;
-
-import org.pf.domain.UserAccount;
-import org.pf.domain.User;
-import org.pf.domain.Currency;
-import org.pf.repository.UserAccountRepository;
-import org.pf.service.UserAccountService;
-import org.pf.repository.search.UserAccountSearchRepository;
-import org.pf.service.dto.UserAccountDTO;
-import org.pf.service.mapper.UserAccountMapper;
-import org.pf.web.rest.errors.ExceptionTranslator;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.pf.FinanceApp;
+import org.pf.domain.Currency;
+import org.pf.domain.User;
+import org.pf.domain.UserAccount;
+import org.pf.domain.enumeration.AccountType;
+import org.pf.repository.UserAccountRepository;
+import org.pf.repository.search.UserAccountSearchRepository;
+import org.pf.service.UserAccountService;
+import org.pf.service.dto.UserAccountDTO;
+import org.pf.service.mapper.UserAccountMapper;
+import org.pf.web.rest.errors.ExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -29,13 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static org.pf.web.rest.TestUtil.createFormattingConversionService;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.pf.web.rest.TestUtil.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import org.pf.domain.enumeration.AccountType;
 /**
  * Test class for the UserAccountResource REST controller.
  *
@@ -208,12 +205,12 @@ public class UserAccountResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllUserAccounts() throws Exception {
+    public void getAllUserAccountsByUserLogin() throws Exception {
         // Initialize the database
         userAccountRepository.saveAndFlush(userAccount);
 
         // Get all the userAccountList
-        restUserAccountMockMvc.perform(get("/api/user-accounts?sort=id,desc"))
+        restUserAccountMockMvc.perform(get("/api/user-accounts?sort=id,desc&login="+ userAccount.getUser().getLogin()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(userAccount.getId().intValue())))

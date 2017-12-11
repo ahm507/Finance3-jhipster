@@ -102,10 +102,10 @@ public class UserAccountResource {
      */
     @GetMapping("/user-accounts")
     @Timed
-    public ResponseEntity<List<UserAccountDTO>> getAllUserAccounts(Pageable pageable) {
+    public ResponseEntity<List<UserAccountDTO>> getAllUserAccountsByUser(@RequestParam(required = true, name = "login") String login, Pageable pageable) {
         log.debug("REST request to get a page of UserAccounts");
         //Page<UserAccountDTO> page = userAccountService.findAll(pageable);
-        Page<UserAccountDTO> page = userAccountService.findByCurrentUser(pageable);
+        Page<UserAccountDTO> page = userAccountService.findByCurrentUser(login, pageable);
 
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/user-accounts");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

@@ -91,10 +91,13 @@ public class CurrencyResource {
      */
     @GetMapping("/currencies")
     @Timed
-    public List<CurrencyDTO> getAllCurrencies() {
+    public List<CurrencyDTO> getAllCurrencies(@RequestParam(required = false, value = "login")  String login) {
         log.debug("REST request to get all Currencies");
-        //return currencyService.findAll();
-        return currencyService.findAllByCurrentUser();
+        if(login == null) { //WEB Currently ONLY.
+            return currencyService.findAllByCurrentUser();
+        }
+        //Unit Test
+        return currencyService.findAllByCurrentUser(login);
         }
 
     /**

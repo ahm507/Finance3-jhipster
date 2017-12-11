@@ -52,5 +52,5 @@ public interface TransactionService {
      */
     Page<TransactionDTO> search(String query, Pageable pageable);
 
-    Page<TransactionDTO> findAllByCurrentUser(Pageable pageable);
+    Page<TransactionDTO> findAllByCurrentUser(String login, Pageable pageable);
 }

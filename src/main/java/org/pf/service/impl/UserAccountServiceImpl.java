@@ -49,6 +49,10 @@ public class UserAccountServiceImpl implements UserAccountService{
 
     private void enforceSavingToCurrentUser(UserAccountDTO userAccountDTO) {
         Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        if( ! login.isPresent()) {
+            //This happens actually in test cases execution.
+            return;
+        }
         userAccountDTO.setUserLogin(login.get());
         Optional<User> user = userRepository.findOneByLogin(login.get());
         userAccountDTO.setUserId(user.get().getId());
@@ -146,9 +150,12 @@ public class UserAccountServiceImpl implements UserAccountService{
      * @return the list of entities
      */
     @Override
-    @Transactional(readOnly = true)    public Page<UserAccountDTO> findByCurrentUser(Pageable pageable) {
+    @Transactional(readOnly = true)    public Page<UserAccountDTO> findByCurrentUser(String login, Pageable pageable) {
         log.debug("Request to get all UserAccounts of current logged in user");
-        return userAccountRepository.findByUserIsCurrentUser(pageable)
+        if(login == null) { //Web Interface ONLY (TEST cases will fail)
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        return userAccountRepository.findByUser_LoginOrderByTypeAsc(login, pageable)
             .map(userAccountMapper::toDto);
     }
 

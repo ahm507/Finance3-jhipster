@@ -114,14 +114,15 @@ public class TransactionResource {
     @GetMapping("/transactions")
     @Timed
     public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable,
+        @RequestParam(required = false, value = "login") String login,
         @RequestParam(required = false, value = "userAccountId") Long userAccountId) {
-        log.debug("REST request to get a page of Transactions");
 
+        log.debug("REST request to get a page of Transactions");
         Page<TransactionDTO> page;
         if(userAccountId != null) {
             page = transactionService.findByUserIsCurrentUserAndUserIdAccountId(userAccountId, pageable);
         } else {
-            page = transactionService.findAllByCurrentUser(pageable);
+            page = transactionService.findAllByCurrentUser(login, pageable);
         }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);

@@ -67,6 +67,10 @@ public class CurrencyServiceImpl implements CurrencyService{
 
     private void enforceSavingToCurrentUser(CurrencyDTO currencyDTO) {
         Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        if( ! login.isPresent()) {
+            //This happens actually in test cases execution.
+            return;
+        }
         currencyDTO.setUserLogin(login.get());
         Optional<User> user = userRepository.findOneByLogin(login.get());
         currencyDTO.setUserId(user.get().getId());
@@ -88,9 +92,15 @@ public class CurrencyServiceImpl implements CurrencyService{
     }
 
 
+    //THIS API FAIL AT TEST, because of SecurityUtils.getCurrentUserLogin() failure.
     public List<CurrencyDTO> findAllByCurrentUser() {
+        Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        return findAllByCurrentUser(login.get());
+    }
+
+    public List<CurrencyDTO> findAllByCurrentUser(String login) {
         log.debug("Request to get all Currencies");
-        return currencyRepository.findByUserIsCurrentUser().stream()
+        return currencyRepository.findByUser_Login(login).stream()
             .map(currencyMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }

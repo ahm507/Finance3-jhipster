@@ -51,6 +51,10 @@ public class UserSettingsServiceImpl implements UserSettingsService{
 
     private void enforceSavingToCurrentUser(UserSettingsDTO userSettingsDTO) {
         Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        if( ! login.isPresent()) {
+            //This happens actually in test cases execution.
+            return;
+        }
         userSettingsDTO.setUserLogin(login.get());
         Optional<User> user = userRepository.findOneByLogin(login.get());
         userSettingsDTO.setUserId(user.get().getId());
@@ -89,9 +93,9 @@ public class UserSettingsServiceImpl implements UserSettingsService{
             .collect(Collectors.toCollection(LinkedList::new));
     }
 
-    public List<UserSettingsDTO> findAllByCurrentUser() {
+    public List<UserSettingsDTO> findAllByCurrentUser(String login) {
         log.debug("Request to get all UserSettings");
-        return userSettingsRepository.findAllByCurrentUser().stream()
+        return userSettingsRepository.findByUser_login(login).stream()
             .map(userSettingsMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }

@@ -18,4 +18,6 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     Page<UserAccount> findByUserIsCurrentUser(Pageable pageable);
 
     long countByUser_IdAndText(Long id, String text);
+
+    Page<UserAccount> findByUser_LoginOrderByTypeAsc(String login, Pageable pageable);
 }

@@ -47,5 +47,5 @@ public interface UserSettingsService {
      */
     List<UserSettingsDTO> search(String query);
 
-    List<UserSettingsDTO> findAllByCurrentUser();
+    List<UserSettingsDTO> findAllByCurrentUser(String login);
 }

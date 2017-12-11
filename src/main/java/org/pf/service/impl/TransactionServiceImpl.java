@@ -67,6 +67,10 @@ public class TransactionServiceImpl implements TransactionService{
 
     private void enforceSavingToCurrentUser(TransactionDTO transactionDTO) {
         Optional<String> login = SecurityUtils.getCurrentUserLogin();
+        if( ! login.isPresent()) {
+            //This happens actually in test cases execution.
+            return;
+        }
         transactionDTO.setUserLogin(login.get());
         Optional<User> user = userRepository.findOneByLogin(login.get());
         transactionDTO.setUserId(user.get().getId());
@@ -94,9 +98,12 @@ public class TransactionServiceImpl implements TransactionService{
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<TransactionDTO> findAllByCurrentUser(Pageable pageable) {
+    public Page<TransactionDTO> findAllByCurrentUser(String login, Pageable pageable) {
         log.debug("Request to get all Transactions");
-        return transactionRepository.findByUserIsCurrentUser(pageable)
+        if(login == null) { //WEB ONLY / NOT UNIT TEST
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        return transactionRepository.findByUser_Login(login, pageable)
             .map(transactionMapper::toDto);
     }
 

@@ -2,6 +2,7 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.pf.security.SecurityUtils;
 import org.pf.service.UserSettingsService;
 import org.pf.service.dto.UserSettingsDTO;
 import org.pf.web.rest.errors.BadRequestAlertException;
@@ -91,10 +92,12 @@ public class UserSettingsResource {
      */
     @GetMapping("/user-settings")
     @Timed
-    public List<UserSettingsDTO> getAllUserSettings() {
+    public List<UserSettingsDTO> getAllUserSettingsByUser(@RequestParam(required = false, name = "login") String login) {
         log.debug("REST request to get all UserSettings");
-        //return userSettingsService.findAll();
-        return userSettingsService.findAllByCurrentUser();
+        if(login == null) { //WEB only. TEST cases will fail.
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        return userSettingsService.findAllByCurrentUser(login);
         }
 
     /**

@@ -26,4 +26,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         + "order by date ASC")
     Page<Transaction> findByUserIsCurrentUserAndUserIdAccountId(Long userAccountId, Pageable pageable);
 
+    Page<Transaction> findByUser_Login(String login, Pageable pageable);
 }

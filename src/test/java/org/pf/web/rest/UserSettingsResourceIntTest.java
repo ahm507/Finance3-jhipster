@@ -1,20 +1,18 @@
 package org.pf.web.rest;
 
-import org.pf.FinanceApp;
-
-import org.pf.domain.UserSettings;
-import org.pf.domain.User;
-import org.pf.repository.UserSettingsRepository;
-import org.pf.service.UserSettingsService;
-import org.pf.repository.search.UserSettingsSearchRepository;
-import org.pf.service.dto.UserSettingsDTO;
-import org.pf.service.mapper.UserSettingsMapper;
-import org.pf.web.rest.errors.ExceptionTranslator;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.pf.FinanceApp;
+import org.pf.domain.User;
+import org.pf.domain.UserSettings;
+import org.pf.repository.UserSettingsRepository;
+import org.pf.repository.search.UserSettingsSearchRepository;
+import org.pf.service.UserSettingsService;
+import org.pf.service.dto.UserSettingsDTO;
+import org.pf.service.mapper.UserSettingsMapper;
+import org.pf.web.rest.errors.ExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -28,9 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static org.pf.web.rest.TestUtil.createFormattingConversionService;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.pf.web.rest.TestUtil.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -196,12 +194,12 @@ public class UserSettingsResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllUserSettings() throws Exception {
+    public void getAllUserSettingsByUser() throws Exception {
         // Initialize the database
         userSettingsRepository.saveAndFlush(userSettings);
 
         // Get all the userSettingsList
-        restUserSettingsMockMvc.perform(get("/api/user-settings?sort=id,desc"))
+        restUserSettingsMockMvc.perform(get("/api/user-settings?sort=id,desc&login=" + userSettings.getUser().getLogin()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(userSettings.getId().intValue())))
