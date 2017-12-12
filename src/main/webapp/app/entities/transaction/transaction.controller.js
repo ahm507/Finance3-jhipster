@@ -26,9 +26,9 @@
         vm.search = search;
 
         vm.changeUserAccount = function() {
-            alert("changed " + vm.userAccount.id);
-
-            
+            //console.log("changed " + vm.selectedUserAccountId);
+            vm.transactions = []; //empty the array
+            loadAll();
         };
 
 
@@ -42,12 +42,6 @@
 
         loadAll();
 
-        function changeUserAccount() {
-            // alert("changed " + vm.userAccount.id);
-            //Load new set of transaction based on the selected userAccount
-
-        }
-
         function loadAll () {
             if (vm.currentSearch) {
                 TransactionSearch.query({
@@ -57,11 +51,18 @@
                     sort: sort()
                 }, onSuccess, onError);
             } else {
+                if(vm.selectedUserAccountId != undefined) {
                 Transaction.query({
                     page: vm.page,
                     size: vm.itemsPerPage,
                     sort: sort(),
-                    userAccount: vm.userAccount.id
+                    userAccountId: vm.selectedUserAccountId
+                    }, onSuccess, onError);
+                } else {
+                    Transaction.query({
+                        page: vm.page,
+                        size: vm.itemsPerPage,
+                        sort: sort()
                 }, onSuccess, onError);
             }
             function sort() {

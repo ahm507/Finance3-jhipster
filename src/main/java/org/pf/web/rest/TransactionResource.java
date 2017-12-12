@@ -119,11 +119,12 @@ public class TransactionResource {
 
         log.debug("REST request to get a page of Transactions");
         Page<TransactionDTO> page;
-        if(userAccountId != null) {
-            page = transactionService.findByUserIsCurrentUserAndUserIdAccountId(userAccountId, pageable);
-        } else {
+        if(userAccountId == null) {
             page = transactionService.findAllByCurrentUser(login, pageable);
+        } else {
+            page = transactionService.findByUserIsCurrentUserAndUserIdAccountId(userAccountId, pageable);
         }
+        log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
