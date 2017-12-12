@@ -2,6 +2,7 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.pf.security.SecurityUtils;
 import org.pf.service.TransactionService;
 import org.pf.service.dto.TransactionDTO;
 import org.pf.web.rest.errors.BadRequestAlertException;
@@ -118,11 +119,14 @@ public class TransactionResource {
         @RequestParam(required = false, value = "userAccountId") Long userAccountId) {
 
         log.debug("REST request to get a page of Transactions");
+        if(login == null) { //TEST cases must send login
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
         Page<TransactionDTO> page;
         if(userAccountId == null) {
             page = transactionService.findAllByCurrentUser(login, pageable);
         } else {
-            page = transactionService.findByUserIsCurrentUserAndUserIdAccountId(userAccountId, pageable);
+            page = transactionService.findByUserLoginAndAccountId(login, userAccountId, pageable);
         }
         log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");

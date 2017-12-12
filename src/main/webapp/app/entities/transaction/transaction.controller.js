@@ -51,19 +51,13 @@
                 }, onSuccess, onError);
             } else {
                 if(vm.selectedUserAccountId != undefined) {
-                Transaction.query({
-                    page: vm.page,
-                    size: vm.itemsPerPage,
-                    sort: sort(),
-                    userAccountId: vm.selectedUserAccountId
-                    }, onSuccess, onError);
-                } else {
                     Transaction.query({
                         page: vm.page,
                         size: vm.itemsPerPage,
-                        sort: sort()
-                }, onSuccess, onError);
-            }
+                        sort: sort(),
+                        userAccountId: vm.selectedUserAccountId
+                        }, onSuccess, onError);
+                } 
             function sort() {
                 var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
                 if (vm.predicate !== 'id') {
@@ -75,7 +69,7 @@
             function onSuccess(data, headers) {
                 vm.links = ParseLinks.parse(headers('link'));
                 vm.totalItems = headers('X-Total-Count');
-                vm.transactions = []; //empty the array                
+                vm.transactions = []; //empty the array
                 for (var i = 0; i < data.length; i++) {
                     vm.transactions.push(data[i]);
                 }

@@ -2,7 +2,10 @@ package org.pf.service.impl;
 
 import org.pf.domain.Transaction;
 import org.pf.domain.User;
+import org.pf.domain.UserAccount;
+import org.pf.domain.enumeration.AccountType;
 import org.pf.repository.TransactionRepository;
+import org.pf.repository.UserAccountRepository;
 import org.pf.repository.UserRepository;
 import org.pf.repository.search.TransactionSearchRepository;
 import org.pf.security.SecurityUtils;
@@ -16,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Optional;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -37,13 +42,16 @@ public class TransactionServiceImpl implements TransactionService{
 
     private final UserRepository userRepository;
 
+    private final UserAccountRepository userAccountRepository;
+
     public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper,
-        TransactionSearchRepository transactionSearchRepository,
-        UserRepository userRepository) {
+        TransactionSearchRepository transactionSearchRepository, UserRepository userRepository,
+        UserAccountRepository userAccountRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
         this.transactionSearchRepository = transactionSearchRepository;
         this.userRepository = userRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     /**
@@ -115,10 +123,16 @@ public class TransactionServiceImpl implements TransactionService{
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<TransactionDTO> findByUserIsCurrentUserAndUserIdAccountId(long userAccountId, Pageable pageable) {
+    public Page<TransactionDTO> findByUserLoginAndAccountId(String login, long userAccountId, Pageable pageable) {
         log.debug("Request to get all Transactions");
-        return transactionRepository.findByUserIsCurrentUserAndUserIdAccountId(userAccountId, pageable)
+
+        Page<TransactionDTO> transactions = transactionRepository.findByUserLoginAndAccountId(login, userAccountId, pageable)
             .map(transactionMapper::toDto);
+
+        UserAccount userAccount = userAccountRepository.findOne(userAccountId);
+        computeBalance(userAccountId, userAccount.getType(), transactions);
+
+        return transactions;
     }
 
 
@@ -163,5 +177,76 @@ public class TransactionServiceImpl implements TransactionService{
         return result.map(transactionMapper::toDto);
     }
 
+
+    int getDepositSign(AccountType type) {
+        switch (type) {
+        case INCOME:
+            return -1;
+        case ASSET:
+            return 1;
+        case EXPENSE:
+            return 1;
+        default:  // if(type.equals("liabilities")) {
+            return -1;
+        }
+    }
+
+    int getWithdrawSign(AccountType type) {
+        switch (type) {
+        case INCOME:
+            return 1;
+        case ASSET:
+            return -1;
+        case EXPENSE:
+            return -1;
+        default:  // if(type.equals("liabilities")) {
+            return 1;
+        }
+    }
+
+    public void computeBalance(long accountId, AccountType type, Page<TransactionDTO> transactions) {
+
+        double bal = 0;
+        List<TransactionDTO> listOfTrans = transactions.getContent();
+        for(int i = 0 ; i < listOfTrans.size(); i++) {
+//            listOfTans.get(i).getBalance()
+            TransactionDTO transactionDTO = listOfTrans.get(i);
+
+            if(transactionDTO.getWithdrawAccountId().equals(accountId)) {
+                bal += transactionDTO.getAmount() * getWithdrawSign(type);
+            }
+            else if(transactionDTO.getDepositAccountId().equals(accountId)) {
+                bal += transactionDTO.getAmount() * getDepositSign(type);
+            }
+            //			trans.balance += bal;
+            transactionDTO.setBalance(transactionDTO.getBalance() + bal);
+
+//            listOfTrans.set(i, transactionDTO);
+
+        }
+
+//        transactions.forEach(transactionDTO -> {
+//
+//            if(transactionDTO.getWithdrawAccountId().equals(accountId)) {
+//                factor = getWithdrawSign(type);
+//                bal += transactionDTO.getAmount() * factor;
+//            }
+//            else if(transactionDTO.getDepositAccountId().equals(accountId)) {
+//                factor = getDepositSign(type);
+//                bal += transactionDTO.getAmount() * factor;
+//            }
+//            //			trans.balance += bal;
+//            transactionDTO.setBalance(transactionDTO.getBalance() + bal);
+//        });
+    }
+
+    static public String formatMoney(double number) {
+        //Format the numbers for display as example "100,050,676.574";
+        if (number == 0) { //double have some error factor
+            return "0.00";
+        }
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+        return formatter.format(number);
+    }
 
 }

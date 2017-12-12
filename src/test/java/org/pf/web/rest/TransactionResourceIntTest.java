@@ -54,6 +54,7 @@ public class TransactionResourceIntTest {
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
+    private static final Double DEFAULT_BALANCE = 1D;
 
     @Autowired
     private TransactionRepository transactionRepository;
@@ -219,13 +220,16 @@ public class TransactionResourceIntTest {
         transactionRepository.saveAndFlush(transaction);
 
         // Get all the transactionList
-        restTransactionMockMvc.perform(get("/api/transactions?sort=id,desc&login=" + transaction.getUser().getLogin()))
+        restTransactionMockMvc.perform(get("/api/transactions?sort=id,desc"
+            + "&login=" + transaction.getUser().getLogin()
+            + "&userAccountId=" + transaction.getDepositAccount().getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(transaction.getId().intValue())))
             .andExpect(jsonPath("$.[*].date").value(hasItem(sameInstant(DEFAULT_DATE))))
             .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
+            .andExpect(jsonPath("$.[*].balance").value(hasItem(DEFAULT_BALANCE)));
     }
 
     @Test

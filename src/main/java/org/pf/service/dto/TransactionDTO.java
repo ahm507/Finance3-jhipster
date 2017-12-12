@@ -1,11 +1,10 @@
 package org.pf.service.dto;
 
 
-import java.time.ZonedDateTime;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -35,6 +34,8 @@ public class TransactionDTO implements Serializable {
     private Long depositAccountId;
 
     private String depositAccountText;
+
+    private Double balance = 0D;
 
     public Long getId() {
         return id;
@@ -144,6 +145,17 @@ public class TransactionDTO implements Serializable {
             ", date='" + getDate() + "'" +
             ", amount=" + getAmount() +
             ", description='" + getDescription() + "'" +
+            ", balance=" + getBalance() +
             "}";
     }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
+
 }

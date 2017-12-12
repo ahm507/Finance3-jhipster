@@ -17,14 +17,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 //    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username}")
 //    List<Transaction> findByUserIsCurrentUser();
 
-    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username} order by date ASC")
-    Page<Transaction> findByUserIsCurrentUser(Pageable pageable);
+//    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username} order by date ASC")
+//    Page<Transaction> findByUserIsCurrentUser(Pageable pageable);
+
+//    @Query("select transaction from Transaction transaction "
+//        + "where transaction.user.login = ?#{principal.username} AND "
+//        + "(transaction.withdrawAccount.id = ?1 OR transaction.depositAccount.id = ?1) "
+//        + "order by date ASC")
+//    Page<Transaction> findByUserIsCurrentUserAndUserIdAccountId(Long userAccountId, Pageable pageable);
 
     @Query("select transaction from Transaction transaction "
-        + "where transaction.user.login = ?#{principal.username} AND "
-        + "(transaction.withdrawAccount.id = ?1 OR transaction.depositAccount.id = ?1) "
+        + "where transaction.user.login = ?1 AND "
+        + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
         + "order by date ASC")
-    Page<Transaction> findByUserIsCurrentUserAndUserIdAccountId(Long userAccountId, Pageable pageable);
+    Page<Transaction> findByUserLoginAndAccountId(String login, Long userAccountId, Pageable pageable);
+
 
     Page<Transaction> findByUser_Login(String login, Pageable pageable);
 }

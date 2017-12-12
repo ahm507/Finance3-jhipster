@@ -18,6 +18,7 @@
             },
             "date": "Date",
             "amount": "Amount",
+            "balance": "Balance",
             "description": "Description",
             "user": "User",
             "withdrawAccount": "Withdraw Account",
