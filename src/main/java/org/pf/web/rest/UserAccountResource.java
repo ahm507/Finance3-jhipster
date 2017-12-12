@@ -2,6 +2,7 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.pf.security.SecurityUtils;
 import org.pf.service.UserAccountService;
 import org.pf.service.dto.UserAccountDTO;
 import org.pf.web.rest.errors.BadRequestAlertException;
@@ -103,9 +104,12 @@ public class UserAccountResource {
      */
     @GetMapping("/user-accounts")
     @Timed
-    public ResponseEntity<List<UserAccountDTO>> getAllUserAccountsByUser(@RequestParam(required = true, name = "login") String login, Pageable pageable) {
+    public ResponseEntity<List<UserAccountDTO>> getAllUserAccountsByUser(@RequestParam(required = false, name = "login") String login, Pageable pageable) {
         log.debug("REST request to get a page of UserAccounts");
         //Page<UserAccountDTO> page = userAccountService.findAll(pageable);
+        if(login == null) { //NOT IN TEST CASES
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
         Page<UserAccountDTO> page = userAccountService.findByCurrentUser(login, pageable);
 
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/user-accounts");
