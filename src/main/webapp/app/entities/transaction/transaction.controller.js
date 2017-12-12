@@ -25,7 +25,11 @@
         vm.loadAll = loadAll;
         vm.search = search;
 
-        vm.changeUserAccount = changeUserAccount;
+        vm.changeUserAccount = function() {
+            alert("changed " + vm.userAccount.id);
+
+            
+        };
 
 
         //Add decorated UserAccount "path" property
@@ -39,7 +43,9 @@
         loadAll();
 
         function changeUserAccount() {
-            alert("changed " + vm.userAccount.id);
+            // alert("changed " + vm.userAccount.id);
+            //Load new set of transaction based on the selected userAccount
+
         }
 
         function loadAll () {
@@ -54,7 +60,8 @@
                 Transaction.query({
                     page: vm.page,
                     size: vm.itemsPerPage,
-                    sort: sort()
+                    sort: sort(),
+                    userAccount: vm.userAccount.id
                 }, onSuccess, onError);
             }
             function sort() {
