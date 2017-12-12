@@ -85,6 +85,7 @@
                 AlertService.error(error.data.message);
             }
         }
+    } //loadAll()
 
         function reset () {
             vm.page = 0;
