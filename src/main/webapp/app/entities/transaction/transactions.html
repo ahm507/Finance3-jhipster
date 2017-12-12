@@ -68,10 +68,14 @@
                         <!--{{transaction.userLogin}}-->
                     <!--</td>-->
                     <td>
-                        <a ui-sref="user-account-detail({id:transaction.withdrawAccountId})">{{transaction.withdrawAccountText}}</a>
+                        <!-- <a ui-sref="user-account-detail({id:transaction.withdrawAccountId})"> -->
+                            {{transaction.withdrawAccountText}}
+                        <!-- </a> -->
                     </td>
                     <td>
-                        <a ui-sref="user-account-detail({id:transaction.depositAccountId})">{{transaction.depositAccountText}}</a>
+                        <!-- <a ui-sref="user-account-detail({id:transaction.depositAccountId})"> -->
+                            {{transaction.depositAccountText}}
+                        <!-- </a> -->
                     </td>
                     <td>{{transaction.amount}}</td>
                     <td>{{transaction.balance}}</td>
