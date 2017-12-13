@@ -27,7 +27,7 @@ public interface TransactionService {
      */
     Page<TransactionDTO> findAll(Pageable pageable);
 
-    public Page<TransactionDTO> findByUserLoginAndAccountId(String lgin, long userAccountId, Pageable pageable) ;
+    public Page<TransactionDTO> findByUserLoginAndAccountId(String lgin, long userAccountId, Pageable pageable);
 
     /**
      * Get the "id" transaction.
@@ -48,13 +48,12 @@ public interface TransactionService {
      * Search for the transaction corresponding to the query.
      *
      * @param query the query of the search
-     *
      * @param pageable the pagination information
      * @return the list of entities
      */
     Page<TransactionDTO> search(String query, Pageable pageable);
 
-    public List<String> getYearList(String login) ;
+    public List<String> getYearList(String login);
 
-    Page<TransactionDTO> findByLoginAndAccountIdAndYear(String login, Long userAccountId, Long year, Pageable pageable);
+    public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable);
 }

@@ -83,9 +83,9 @@ public class UserAccountServiceImpl implements UserAccountService{
      */
     public boolean isDuplicateName(String login, String accountText) {
         //Get User Credentials
-//        if(login == null) { //WEB ONLY- NOT TEST CASES.
-//            login = SecurityUtils.getCurrentUserLogin().get();
-//        }
+        if(login == null) { //WEB ONLY- NOT TEST CASES.
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
         Optional<User> user = userRepository.findOneByLogin(login);
         long accountsCount = userAccountRepository.countByUser_IdAndText(user.get().getId(), accountText);
         return ( accountsCount > 0)? true: false;

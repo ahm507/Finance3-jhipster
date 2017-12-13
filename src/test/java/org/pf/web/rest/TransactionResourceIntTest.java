@@ -414,7 +414,7 @@ public class TransactionResourceIntTest {
         // Get all the transactionList
         restTransactionMockMvc.perform(get("/api/transactions?"
             + "&login=" + transaction.getUser().getLogin()
-            + "&userAccountId=" + transaction.getDepositAccount().getId()
+            + "&userAccountId=" + transaction.getWithdrawAccount().getId()
             + "&year=" + transaction.getDate().getYear()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))

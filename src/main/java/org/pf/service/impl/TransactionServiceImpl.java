@@ -134,7 +134,7 @@ public class TransactionServiceImpl implements TransactionService{
             .map(transactionMapper::toDto);
 
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
-        computeBalance(userAccountId, userAccount.getType(), transactions);
+        computeBalance(userAccountId, userAccount.getType(), transactions, 0);
 
         return transactions;
     }
@@ -182,7 +182,7 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
 
-    int getDepositSign(AccountType type) {
+    private int getDepositSign(AccountType type) {
         switch (type) {
         case INCOME:
             return -1;
@@ -195,7 +195,7 @@ public class TransactionServiceImpl implements TransactionService{
         }
     }
 
-    int getWithdrawSign(AccountType type) {
+    private int getWithdrawSign(AccountType type) {
         switch (type) {
         case INCOME:
             return 1;
@@ -208,40 +208,22 @@ public class TransactionServiceImpl implements TransactionService{
         }
     }
 
-    public void computeBalance(long accountId, AccountType type, Page<TransactionDTO> transactions) {
+    private void computeBalance(long accountId, AccountType type, Page<TransactionDTO> transactions,
+        double initialBalance) {
 
-        double bal = 0;
+        double bal = initialBalance;
         List<TransactionDTO> listOfTrans = transactions.getContent();
-        for(int i = 0 ; i < listOfTrans.size(); i++) {
-//            listOfTans.get(i).getBalance()
-            TransactionDTO transactionDTO = listOfTrans.get(i);
-
-            if(transactionDTO.getWithdrawAccountId().equals(accountId)) {
+        for (TransactionDTO transactionDTO : listOfTrans) {
+            //            listOfTans.get(i).getBalance()
+            if (transactionDTO.getWithdrawAccountId().equals(accountId)) {
                 bal += transactionDTO.getAmount() * getWithdrawSign(type);
-            }
-            else if(transactionDTO.getDepositAccountId().equals(accountId)) {
+            } else if (transactionDTO.getDepositAccountId().equals(accountId)) {
                 bal += transactionDTO.getAmount() * getDepositSign(type);
             }
             //			trans.balance += bal;
             transactionDTO.setBalance(transactionDTO.getBalance() + bal);
-
-//            listOfTrans.set(i, transactionDTO);
-
         }
 
-//        transactions.forEach(transactionDTO -> {
-//
-//            if(transactionDTO.getWithdrawAccountId().equals(accountId)) {
-//                factor = getWithdrawSign(type);
-//                bal += transactionDTO.getAmount() * factor;
-//            }
-//            else if(transactionDTO.getDepositAccountId().equals(accountId)) {
-//                factor = getDepositSign(type);
-//                bal += transactionDTO.getAmount() * factor;
-//            }
-//            //			trans.balance += bal;
-//            transactionDTO.setBalance(transactionDTO.getBalance() + bal);
-//        });
     }
 
     static public String formatMoney(double number) {
@@ -253,7 +235,7 @@ public class TransactionServiceImpl implements TransactionService{
         return formatter.format(number);
     }
 
-    public List<String> generateYearList(ZonedDateTime minDate, ZonedDateTime maxDate) {
+    private List<String> generateYearList(ZonedDateTime minDate, ZonedDateTime maxDate) {
         if(minDate == null || maxDate == null) {
             return new ArrayList<>(); //just empty list
         } else {
@@ -279,10 +261,10 @@ public class TransactionServiceImpl implements TransactionService{
         return new ArrayList<String>(); //empty list
     }
 
-    public Page<TransactionDTO> findByLoginAndAccountIdAndYear(String login, Long userAccountId, Long year, Pageable pageable) {
+    private Page<TransactionDTO> findYearTransactionsForIncomeAndExepnses(String login, Long userAccountId, Long year, Pageable pageable) {
         log.debug("Request to get all Transactions of account and in some year");
 
-        ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
             ZoneId.systemDefault()));
         ZonedDateTime toDate = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
             ZoneId.systemDefault()));
@@ -291,9 +273,48 @@ public class TransactionServiceImpl implements TransactionService{
             .map(transactionMapper::toDto);
 
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
-        computeBalance(userAccountId, userAccount.getType(), transactions);
+        computeBalance(userAccountId, userAccount.getType(), transactions, 0);
         return transactions;
+    }
 
+    private  Page<TransactionDTO> findYearTransactionsForAssetAndLiability(String login, Long accountId, Long year, Pageable pageable) {
+
+        //1) Get ppast years transactions to get past balance
+        ZonedDateTime fromDate = ZonedDateTime.parse("1900-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZoneId.systemDefault()));
+        ZonedDateTime toDate = ZonedDateTime.parse((year-1) + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZoneId.systemDefault()));
+        Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, fromDate, toDate, pageable)
+            .map(transactionMapper::toDto);
+
+        UserAccount userAccount = userAccountRepository.findOne(accountId);
+        computeBalance(accountId, userAccount.getType(), transactions, 0);
+        //Might be there is no past transactions
+        Double pastBalance = 0D;
+        if(transactions.getContent().size() > 0) {
+            pastBalance = transactions.getContent().get(transactions.getContent().size() - 1).getBalance();
+        }
+
+        //2) Get this year transactions
+
+        ZonedDateTime thisYearStart = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZoneId.systemDefault()));
+        ZonedDateTime thisYearEnd   = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZoneId.systemDefault()));
+        transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, thisYearStart, thisYearEnd, pageable)
+            .map(transactionMapper::toDto);
+
+        computeBalance(accountId, userAccount.getType(), transactions, pastBalance);
+        return transactions;
+    }
+
+    public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable) {
+
+        UserAccount userAccount = userAccountRepository.findOne(userAccountId);
+        if(userAccount.getType() == AccountType.ASSET || userAccount.getType() == AccountType.LIABILITY) {
+            return findYearTransactionsForAssetAndLiability(login, userAccountId, year, pageable);
+        }
+        return findYearTransactionsForIncomeAndExepnses(login, userAccountId, year, pageable);
     }
 
 }

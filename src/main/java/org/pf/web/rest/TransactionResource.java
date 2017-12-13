@@ -133,7 +133,7 @@ public class TransactionResource {
             throw new NotImplementedException(); //Not needed actually
         } else {
             //both are not null
-            page = transactionService.findByLoginAndAccountIdAndYear(login, userAccountId, year, pageable);
+            page = transactionService.findYearTransactions(login, userAccountId, year, pageable);
         }
         log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
