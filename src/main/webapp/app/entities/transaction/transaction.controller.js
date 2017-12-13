@@ -25,13 +25,17 @@
         vm.loadAll = loadAll;
         vm.search = search;
 
+        vm.selectedUserAccountId = parseInt(localStorage.getItem("selectedUserAccountId"));
+        vm.yearSelected          = localStorage.getItem("yearSelected");
+
         vm.changeUserAccount = function() {
-            //console.log("changed " + vm.selectedUserAccountId);
+            localStorage.setItem("selectedUserAccountId", vm.selectedUserAccountId);
             loadAll();
         };
 
         //Load year list
         vm.changedYear = function() {
+            localStorage.setItem("yearSelected", vm.yearSelected);
             loadAll();
         }
 
@@ -49,6 +53,8 @@
         loadAll();
 
         function loadAll () {
+            
+
             if (vm.currentSearch) {
                 TransactionSearch.query({
                     query: vm.currentSearch,
