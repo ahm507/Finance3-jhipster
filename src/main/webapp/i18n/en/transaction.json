@@ -23,7 +23,8 @@
             "user": "User",
             "withdrawAccount": "Withdraw Account",
             "depositAccount": "Deposit Account",
-            "accountList": "Account List"
+            "accountList": "Account List",
+            "yearList": "Year List"
         }
     }
 }

@@ -33,6 +33,14 @@
     <br/>
 
     <div class="form-group">
+        <label data-translate="financeApp.transaction.yearList" >Year List</label>
+        <select class="form-control" id="field_yearList" name="yearList"
+            ng-model="vm.yearSelected"
+            ng-options="yearList as yearList for yearList in vm.yearList"
+            ng-change="vm.changedYear()"
+            required>
+        </select>
+
         <label data-translate="financeApp.transaction.accountList" for="field_withdrawAccount">Account List</label>
         <select class="form-control" id="field_withdrawAccount" name="withdrawAccount"
             ng-model="vm.selectedUserAccountId"
@@ -40,6 +48,7 @@
             ng-change="vm.changeUserAccount()"
             required>
         </select>
+        
     </div>
 
 

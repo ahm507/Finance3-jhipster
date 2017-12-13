@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -387,4 +388,38 @@ public class TransactionResourceIntTest {
         assertThat(transactionMapper.fromId(42L).getId()).isEqualTo(42);
         assertThat(transactionMapper.fromId(null)).isNull();
     }
+
+
+    @Test
+    @Transactional
+    public void testYearList () throws Exception {
+        // Initialize the database
+        transactionRepository.saveAndFlush(transaction);
+
+        // Get all the transactionList
+        MvcResult result = restTransactionMockMvc.perform(get("/api/transactions/yearList?"
+            + "login=" + transaction.getUser().getLogin()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(content().string(containsString("1970")))
+            .andReturn();
+    }
+
+    @Test
+    @Transactional
+    public void getAllTransactionsByLoginAndAccountIdAndYear() throws Exception {
+        // Initialize the database
+        transactionRepository.saveAndFlush(transaction);
+
+        // Get all the transactionList
+        restTransactionMockMvc.perform(get("/api/transactions?"
+            + "&login=" + transaction.getUser().getLogin()
+            + "&userAccountId=" + transaction.getDepositAccount().getId()
+            + "&year=" + transaction.getDate().getYear()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].date").value(hasItem(sameInstant(DEFAULT_DATE))))
+            .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())));
+    }
+
 }

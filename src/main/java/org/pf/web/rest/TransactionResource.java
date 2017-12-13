@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -116,23 +117,28 @@ public class TransactionResource {
     @Timed
     public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable,
         @RequestParam(required = false, value = "login") String login,
-        @RequestParam(required = false, value = "userAccountId") Long userAccountId) {
+        @RequestParam(required = false, value = "userAccountId") Long userAccountId,
+        @RequestParam(required = false, value = "year") Long year) {
 
         log.debug("REST request to get a page of Transactions");
         if(login == null) { //TEST cases must send login
             login = SecurityUtils.getCurrentUserLogin().get();
         }
         Page<TransactionDTO> page;
-        if(userAccountId == null) {
-            page = transactionService.findAllByCurrentUser(login, pageable);
-        } else {
+        if(userAccountId == null && year == null) {
+            throw new NotImplementedException(); //Not needed actually
+        } else if (year == null){
             page = transactionService.findByUserLoginAndAccountId(login, userAccountId, pageable);
+        } else if (userAccountId == null ) {
+            throw new NotImplementedException(); //Not needed actually
+        } else {
+            //both are not null
+            page = transactionService.findByLoginAndAccountIdAndYear(login, userAccountId, year, pageable);
         }
         log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
-
 
     /**
      * GET  /transactions/:id : get the "id" transaction.
@@ -178,5 +184,17 @@ public class TransactionResource {
         HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/transactions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
+
+    @GetMapping("/transactions/yearList")
+    @Timed
+    public List<String> getYearList(@RequestParam(required = false, value = "login") String login) {
+        log.debug("REST request to get year range that exists in transactions. Null if there are no transactions");
+        if(login == null) { //TEST cases must send login
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        List<String> years = transactionService.getYearList(login);
+        return years;
+    }
+
 
 }

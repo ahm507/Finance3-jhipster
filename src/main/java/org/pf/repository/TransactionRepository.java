@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
+
 /**
  * Spring Data JPA repository for the Transaction entity.
  */
@@ -17,15 +19,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 //    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username}")
 //    List<Transaction> findByUserIsCurrentUser();
 
-//    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username} order by date ASC")
-//    Page<Transaction> findByUserIsCurrentUser(Pageable pageable);
-
-//    @Query("select transaction from Transaction transaction "
-//        + "where transaction.user.login = ?#{principal.username} AND "
-//        + "(transaction.withdrawAccount.id = ?1 OR transaction.depositAccount.id = ?1) "
-//        + "order by date ASC")
-//    Page<Transaction> findByUserIsCurrentUserAndUserIdAccountId(Long userAccountId, Pageable pageable);
-
     @Query("select transaction from Transaction transaction "
         + "where transaction.user.login = ?1 AND "
         + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
@@ -34,4 +27,18 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
 
     Page<Transaction> findByUser_Login(String login, Pageable pageable);
+
+    @Query(value = "SELECT min(r.date) FROM Transaction r where r.user.login = ?1")
+    ZonedDateTime queryMinDate(String login);
+
+    @Query(value = "SELECT max(r.date) FROM Transaction r where r.user.login = ?1")
+    ZonedDateTime queryMaxDate(String login);
+
+    @Query("SELECT t FROM Transaction t "
+        + "where t.user.login=?1 "
+        + "AND (t.withdrawAccount.id =?2 OR t.depositAccount.id =?2) "
+        + "AND (t.date BETWEEN ?3 AND ?4) "
+        + "ORDER BY t.date")
+    Page<Transaction> findByLoginAndAccountIdAndYear(String login, Long userAccountId, ZonedDateTime fromDate, ZonedDateTime toDate, Pageable pageable);
+
 }

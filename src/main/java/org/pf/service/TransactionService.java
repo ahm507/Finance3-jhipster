@@ -4,6 +4,8 @@ import org.pf.service.dto.TransactionDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service Interface for managing Transaction.
  */
@@ -52,5 +54,7 @@ public interface TransactionService {
      */
     Page<TransactionDTO> search(String query, Pageable pageable);
 
-    Page<TransactionDTO> findAllByCurrentUser(String login, Pageable pageable);
+    public List<String> getYearList(String login) ;
+
+    Page<TransactionDTO> findByLoginAndAccountIdAndYear(String login, Long userAccountId, Long year, Pageable pageable);
 }

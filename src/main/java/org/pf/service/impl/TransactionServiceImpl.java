@@ -20,6 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DecimalFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,22 +102,22 @@ public class TransactionServiceImpl implements TransactionService{
             .map(transactionMapper::toDto);
     }
 
-    /**
-     * Get all the transactions.
-     *
-     * @param pageable the pagination information
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Page<TransactionDTO> findAllByCurrentUser(String login, Pageable pageable) {
-        log.debug("Request to get all Transactions");
-        if(login == null) { //WEB ONLY / NOT UNIT TEST
-            login = SecurityUtils.getCurrentUserLogin().get();
-        }
-        return transactionRepository.findByUser_Login(login, pageable)
-            .map(transactionMapper::toDto);
-    }
+//    /**
+//     * Get all the transactions.
+//     *
+//     * @param pageable the pagination information
+//     * @return the list of entities
+//     */
+//    @Override
+//    @Transactional(readOnly = true)
+//    public Page<TransactionDTO> findAllByCurrentUser(String login, Pageable pageable) {
+//        log.debug("Request to get all Transactions");
+//        if(login == null) { //WEB ONLY / NOT UNIT TEST
+//            login = SecurityUtils.getCurrentUserLogin().get();
+//        }
+//        return transactionRepository.findByUser_Login(login, pageable)
+//            .map(transactionMapper::toDto);
+//    }
 
     /**
      * Get all the transactions.
@@ -247,6 +251,49 @@ public class TransactionServiceImpl implements TransactionService{
         }
         DecimalFormat formatter = new DecimalFormat("#,###.00");
         return formatter.format(number);
+    }
+
+    public List<String> generateYearList(ZonedDateTime minDate, ZonedDateTime maxDate) {
+        if(minDate == null || maxDate == null) {
+            return new ArrayList<>(); //just empty list
+        } else {
+            int minYear = minDate.getYear();
+            int maxYear = maxDate.getYear();
+            ArrayList<String> years = new ArrayList<>();
+            years.add(" "); //All years, means no filter
+            for(int y = minYear; y <= maxYear; y++) {
+                years.add(String.valueOf(y));
+            }
+            return years;
+        }
+    }
+
+    public List<String> getYearList(String login) {
+
+        ZonedDateTime minDate = transactionRepository.queryMinDate(login);
+        ZonedDateTime maxDate = transactionRepository.queryMaxDate(login);
+
+        if(minDate != null && maxDate != null) { //Null only if there is no transaction at all
+            return generateYearList(minDate, maxDate);
+        }
+        return new ArrayList<String>(); //empty list
+    }
+
+    public Page<TransactionDTO> findByLoginAndAccountIdAndYear(String login, Long userAccountId, Long year, Pageable pageable) {
+        log.debug("Request to get all Transactions of account and in some year");
+
+        ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZoneId.systemDefault()));
+        ZonedDateTime toDate = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZoneId.systemDefault()));
+
+        Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, userAccountId, fromDate, toDate, pageable)
+            .map(transactionMapper::toDto);
+
+        UserAccount userAccount = userAccountRepository.findOne(userAccountId);
+        computeBalance(userAccountId, userAccount.getType(), transactions);
+        return transactions;
+
     }
 
 }
