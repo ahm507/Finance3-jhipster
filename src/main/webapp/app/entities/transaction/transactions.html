@@ -1,6 +1,7 @@
 <div>
     <h2 data-translate="financeApp.transaction.home.title">Transactions</h2>
     <jhi-alert></jhi-alert>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
@@ -31,23 +32,26 @@
         </div>
     </div>
     <br/>
-
-    <div class="form-group">
-        <label data-translate="financeApp.transaction.yearList" >Year List</label>
-        <select class="form-control" id="field_yearList" name="yearList"
-            ng-model="vm.yearSelected"
-            ng-options="yearList as yearList for yearList in vm.yearList"
-            ng-change="vm.changedYear()"
-            required>
-        </select>
-
-        <label data-translate="financeApp.transaction.accountList" for="field_withdrawAccount">Account List</label>
-        <select class="form-control" id="field_withdrawAccount" name="withdrawAccount"
-            ng-model="vm.selectedUserAccountId"
-            ng-options="userAccount.id as userAccount.path for userAccount in vm.useraccounts"
-            ng-change="vm.changeUserAccount()"
-            required>
-        </select>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-2 no-padding-left">
+                <label data-translate="financeApp.transaction.yearList" >Year List</label>
+                <select class="form-control" id="field_yearList" name="yearList"
+                    ng-model="vm.yearSelected"
+                    ng-options="yearList as yearList for yearList in vm.yearList"
+                    ng-change="vm.changedYear()"
+                    required>
+                </select>
+            </div>
+            <div class="col-xs-10 no-padding-right">
+             <label data-translate="financeApp.transaction.accountList" for="field_withdrawAccount">Account List</label>
+                <select class="form-control" id="field_withdrawAccount" name="withdrawAccount"
+                    ng-model="vm.selectedUserAccountId"
+                    ng-options="userAccount.id as userAccount.path for userAccount in vm.useraccounts"
+                    ng-change="vm.changeUserAccount()"
+                    required>
+                </select>
+            </div>
         
     </div>
 
