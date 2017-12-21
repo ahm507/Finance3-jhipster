@@ -37,6 +37,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 public class TransactionServiceImpl implements TransactionService{
 
     public static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
+    public static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
     private final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     private final TransactionRepository transactionRepository;
@@ -210,7 +211,6 @@ public class TransactionServiceImpl implements TransactionService{
             } else if (transactionDTO.getDepositAccountId().equals(accountId)) {
                 bal += transactionDTO.getAmount() * getDepositSign(type);
             }
-            //			trans.balance += bal;
             transactionDTO.setBalance(transactionDTO.getBalance() + bal);
         }
 
@@ -256,7 +256,7 @@ public class TransactionServiceImpl implements TransactionService{
             ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
                 YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        ZonedDateTime toDate = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern(
+        ZonedDateTime toDate = ZonedDateTime.parse(year + END_OF_MONTH_STRING, DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
 
@@ -274,7 +274,7 @@ public class TransactionServiceImpl implements TransactionService{
         ZonedDateTime fromDate = ZonedDateTime.parse("1900-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        ZonedDateTime toDate = ZonedDateTime.parse((year-1) + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern(
+        ZonedDateTime toDate = ZonedDateTime.parse((year-1) + END_OF_MONTH_STRING, DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
         Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, fromDate, toDate, pageable)
@@ -293,7 +293,7 @@ public class TransactionServiceImpl implements TransactionService{
         ZonedDateTime thisYearStart = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        ZonedDateTime thisYearEnd   = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern(
+        ZonedDateTime thisYearEnd   = ZonedDateTime.parse(year + END_OF_MONTH_STRING, DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
         transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, thisYearStart, thisYearEnd, pageable)
