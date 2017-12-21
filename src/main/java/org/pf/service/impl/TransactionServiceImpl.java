@@ -247,7 +247,7 @@ public class TransactionServiceImpl implements TransactionService{
         if(minDate != null && maxDate != null) { //Null only if there is no transaction at all
             return generateYearList(minDate, maxDate);
         }
-        return new ArrayList<String>(); //empty list
+        return new ArrayList<>(); //empty list
     }
 
     private Page<TransactionDTO> findYearTransactionsForIncomeAndExepnses(String login, Long userAccountId, Long year, Pageable pageable) {
@@ -284,7 +284,7 @@ public class TransactionServiceImpl implements TransactionService{
         computeBalance(accountId, userAccount.getType(), transactions, 0);
         //Might be there is no past transactions
         Double pastBalance = 0D;
-        if(transactions.getContent().size() > 0) {
+        if(! transactions.getContent().isEmpty()) {
             pastBalance = transactions.getContent().get(transactions.getContent().size() - 1).getBalance();
         }
 
@@ -313,16 +313,10 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     public boolean isInvalidCurrencies(TransactionDTO transactionDTO) {
-
         long depositId = transactionDTO.getDepositAccountId();
         long withdrawId = transactionDTO.getWithdrawAccountId();
-        if(userAccountRepository.findOne(depositId).getCurrency().getId() !=
-            userAccountRepository.findOne(withdrawId).getCurrency().getId()) {
-
-            return true;
-        }
-        return false;
-
+        return (userAccountRepository.findOne(depositId).getCurrency().getId() !=
+            userAccountRepository.findOne(withdrawId).getCurrency().getId());
     }
 
 }
