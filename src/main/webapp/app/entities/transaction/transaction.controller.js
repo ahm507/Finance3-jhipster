@@ -53,7 +53,7 @@
         loadAll();
 
         function loadAll () {
-            
+
 
             if (vm.currentSearch) {
                 TransactionSearch.query({
@@ -77,7 +77,9 @@
                     params.year = vm.yearSelected;
                 }
                 Transaction.query(params, onSuccess, onError);
-            
+
+
+            }
                 function sort() {
                     var result = [vm.predicate + ',' + (vm.reverse ? 'asc' : 'desc')];
                     if (vm.predicate !== 'id') {
@@ -98,7 +100,6 @@
                 function onError(error) {
                     AlertService.error(error.data.message);
                 }
-            }
         } //loadAll()
 
         function reset () {
