@@ -190,7 +190,11 @@ public class TransactionServiceImpl implements TransactionService{
             return 1;
         case EXPENSE:
             return 1;
-        default:  // if(type.equals("liabilities")) {
+        case LIABILITY:
+            return -1;
+        case OTHER:
+            return 1;
+        default:
             return -1;
         }
     }
