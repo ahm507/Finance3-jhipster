@@ -36,6 +36,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Transactional
 public class TransactionServiceImpl implements TransactionService{
 
+    public static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
     private final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     private final TransactionRepository transactionRepository;
@@ -102,22 +103,6 @@ public class TransactionServiceImpl implements TransactionService{
             .map(transactionMapper::toDto);
     }
 
-//    /**
-//     * Get all the transactions.
-//     *
-//     * @param pageable the pagination information
-//     * @return the list of entities
-//     */
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Page<TransactionDTO> findAllByCurrentUser(String login, Pageable pageable) {
-//        log.debug("Request to get all Transactions");
-//        if(login == null) { //WEB ONLY / NOT UNIT TEST
-//            login = SecurityUtils.getCurrentUserLogin().get();
-//        }
-//        return transactionRepository.findByUser_Login(login, pageable)
-//            .map(transactionMapper::toDto);
-//    }
 
     /**
      * Get all the transactions.
@@ -184,16 +169,15 @@ public class TransactionServiceImpl implements TransactionService{
 
     private int getDepositSign(AccountType type) {
         switch (type) {
-        case INCOME:
-            return -1;
         case ASSET:
             return 1;
         case EXPENSE:
             return 1;
+
+        case INCOME:
+            return -1;
         case LIABILITY:
             return -1;
-        case OTHER:
-            return 1;
         default:
             return -1;
         }
@@ -207,7 +191,9 @@ public class TransactionServiceImpl implements TransactionService{
             return -1;
         case EXPENSE:
             return -1;
-        default:  // if(type.equals("liabilities")) {
+        case LIABILITY:
+            return 1;
+        default:
             return 1;
         }
     }
@@ -230,8 +216,7 @@ public class TransactionServiceImpl implements TransactionService{
 
     }
 
-    static public String formatMoney(double number) {
-        //Format the numbers for display as example "100,050,676.574";
+    public static String formatMoney(double number) {
         if (number == 0) { //double have some error factor
             return "0.00";
         }
@@ -268,9 +253,11 @@ public class TransactionServiceImpl implements TransactionService{
     private Page<TransactionDTO> findYearTransactionsForIncomeAndExepnses(String login, Long userAccountId, Long year, Pageable pageable) {
         log.debug("Request to get all Transactions of account and in some year");
 
-            ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+            ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
+                YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        ZonedDateTime toDate = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+        ZonedDateTime toDate = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern(
+            YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
 
         Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, userAccountId, fromDate, toDate, pageable)
@@ -284,9 +271,11 @@ public class TransactionServiceImpl implements TransactionService{
     private  Page<TransactionDTO> findYearTransactionsForAssetAndLiability(String login, Long accountId, Long year, Pageable pageable) {
 
         //1) Get ppast years transactions to get past balance
-        ZonedDateTime fromDate = ZonedDateTime.parse("1900-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+        ZonedDateTime fromDate = ZonedDateTime.parse("1900-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
+            YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        ZonedDateTime toDate = ZonedDateTime.parse((year-1) + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+        ZonedDateTime toDate = ZonedDateTime.parse((year-1) + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern(
+            YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
         Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, fromDate, toDate, pageable)
             .map(transactionMapper::toDto);
@@ -301,9 +290,11 @@ public class TransactionServiceImpl implements TransactionService{
 
         //2) Get this year transactions
 
-        ZonedDateTime thisYearStart = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+        ZonedDateTime thisYearStart = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
+            YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        ZonedDateTime thisYearEnd   = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S").withZone(
+        ZonedDateTime thisYearEnd   = ZonedDateTime.parse(year + "-12-31 23:59:59.0", DateTimeFormatter.ofPattern(
+            YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
         transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, thisYearStart, thisYearEnd, pageable)
             .map(transactionMapper::toDto);
