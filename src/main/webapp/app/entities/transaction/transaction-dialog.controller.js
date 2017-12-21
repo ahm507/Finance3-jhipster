@@ -18,6 +18,11 @@
         vm.users = User.query();
         vm.useraccounts = UserAccount.query();
 
+        //initiate date control to today now.
+        if( vm.transaction.date == null) {
+            vm.transaction.date = new Date();
+        }
+
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();
         });
