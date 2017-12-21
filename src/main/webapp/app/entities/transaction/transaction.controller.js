@@ -43,7 +43,7 @@
         vm.useraccounts = UserAccount.query({}, onSuccess);
         function onSuccess(data) {
             data.forEach(function (element) {
-                element.path = element.type + ' in ' + element.currencyName + ' - ' + element.text;
+                 element.path = element.text + ' - ' + element.type + '(' + element.currencyName + ')';
             });
         }
 
