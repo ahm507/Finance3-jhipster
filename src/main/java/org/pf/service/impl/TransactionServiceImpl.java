@@ -317,4 +317,17 @@ public class TransactionServiceImpl implements TransactionService{
         return findYearTransactionsForIncomeAndExepnses(login, userAccountId, year, pageable);
     }
 
+    public boolean isInvalidCurrencies(TransactionDTO transactionDTO) {
+
+        long depositId = transactionDTO.getDepositAccountId();
+        long withdrawId = transactionDTO.getWithdrawAccountId();
+        if(userAccountRepository.findOne(depositId).getCurrency().getId() !=
+            userAccountRepository.findOne(withdrawId).getCurrency().getId()) {
+
+            return true;
+        }
+        return false;
+
+    }
+
 }

@@ -2,6 +2,7 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.apache.commons.lang.NotImplementedException;
 import org.pf.security.SecurityUtils;
 import org.pf.service.TransactionService;
 import org.pf.service.dto.TransactionDTO;
@@ -24,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -63,6 +63,15 @@ public class TransactionResource {
         if (transactionDTO.getId() != null) {
             throw new BadRequestAlertException("A new transaction cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        if(transactionDTO.getAmount() < 0) {
+            throw new BadRequestAlertException("Amount is not allowed to be less than zero", ENTITY_NAME, "negative.value");
+        }
+
+        if(transactionService.isInvalidCurrencies(transactionDTO)) {
+            throw new BadRequestAlertException("Transactions should be between consistent currencies", ENTITY_NAME, "currency.value");
+        }
+
         TransactionDTO result = transactionService.save(transactionDTO);
         return ResponseEntity.created(new URI("/api/transactions/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
@@ -135,7 +144,8 @@ public class TransactionResource {
             //both are not null
             page = transactionService.findYearTransactions(login, userAccountId, year, pageable);
         }
-        log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
+        //log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
+        log.debug("Getting transactions for userAccountID={0}, count={1}" ,userAccountId, page.getTotalElements());
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
@@ -192,8 +202,7 @@ public class TransactionResource {
         if(login == null) { //TEST cases must send login
             login = SecurityUtils.getCurrentUserLogin().get();
         }
-        List<String> years = transactionService.getYearList(login);
-        return years;
+        return transactionService.getYearList(login);
     }
 
 

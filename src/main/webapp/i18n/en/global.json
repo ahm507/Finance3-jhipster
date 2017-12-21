@@ -124,7 +124,9 @@
         "userexists": "Login name already used!",
         "emailexists": "Email is already in use!",
         "idexists": "A new {{ entityName }} cannot already have an ID",
-        "value.duplicate": "Value already exist, it should be distinct"
+        "value.duplicate": "Value already exist, it should be distinct",
+        "negative.value": "Amount is not allowed to be less than zero",
+        "currency.value": "Transactions should be between consistent currencies"
     },
     "footer": "This is your footer"
 }

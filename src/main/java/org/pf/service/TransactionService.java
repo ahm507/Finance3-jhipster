@@ -56,4 +56,6 @@ public interface TransactionService {
     public List<String> getYearList(String login);
 
     public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable);
+
+    boolean isInvalidCurrencies(TransactionDTO transactionDTO);
 }

@@ -37,7 +37,22 @@
         }
 
         function save () {
+
+            //validate amount
+//            if(vm.transaction.amount < 0) {
+//                alert("Invalid amount");
+//                return;
+//            }
+//            //validate currencies are the same
+//            var depositAccount  = vm.useraccounts.filter(item => item.id == vm.transaction.depositAccountId);
+//            var withdrawAccount = vm.useraccounts.filter(item => item.id == vm.transaction.withdrawAccountId);
+//            if(depositAccount[0].currencyId != withdrawAccount[0].currencyId) {
+//                alert("Transaction is not allowed to be cross currencies");
+//                return;
+//            }
+
             vm.isSaving = true;
+
             if (vm.transaction.id !== null) {
                 Transaction.update(vm.transaction, onSaveSuccess, onSaveError);
             } else {
