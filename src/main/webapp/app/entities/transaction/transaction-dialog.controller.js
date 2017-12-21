@@ -16,7 +16,12 @@
         vm.openCalendar = openCalendar;
         vm.save = save;
         vm.users = User.query();
-        vm.useraccounts = UserAccount.query();
+        vm.useraccounts = UserAccount.query({}, onSuccessUserAccounts);
+        function onSuccessUserAccounts(data) {
+            data.forEach(function (element) {
+                 element.path = element.text + ' - ' + element.type + '(' + element.currencyName + ')';
+            });
+        }
 
         //initiate date control to today now.
         if( vm.transaction.date == null) {

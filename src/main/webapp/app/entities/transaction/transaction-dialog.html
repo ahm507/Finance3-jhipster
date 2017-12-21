@@ -75,7 +75,7 @@
         </div>
         <div class="form-group">
             <label data-translate="financeApp.transaction.withdrawAccount" for="field_withdrawAccount">Withdraw Account</label>
-            <select class="form-control" id="field_withdrawAccount" name="withdrawAccount" ng-model="vm.transaction.withdrawAccountId" ng-options="userAccount.id as userAccount.text for userAccount in vm.useraccounts"             required>
+            <select class="form-control" id="field_withdrawAccount" name="withdrawAccount" ng-model="vm.transaction.withdrawAccountId" ng-options="userAccount.id as userAccount.path for userAccount in vm.useraccounts"             required>
             </select>
         </div>
         <div ng-show="editForm.withdrawAccount.$invalid">
@@ -86,7 +86,7 @@
         </div>
         <div class="form-group">
             <label data-translate="financeApp.transaction.depositAccount" for="field_depositAccount">Deposit Account</label>
-            <select class="form-control" id="field_depositAccount" name="depositAccount" ng-model="vm.transaction.depositAccountId" ng-options="userAccount.id as userAccount.text for userAccount in vm.useraccounts"             required>
+            <select class="form-control" id="field_depositAccount" name="depositAccount" ng-model="vm.transaction.depositAccountId" ng-options="userAccount.id as userAccount.path for userAccount in vm.useraccounts"             required>
             </select>
         </div>
         <div ng-show="editForm.depositAccount.$invalid">
