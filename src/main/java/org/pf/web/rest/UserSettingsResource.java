@@ -2,7 +2,6 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
-import org.pf.security.SecurityUtils;
 import org.pf.service.UserSettingsService;
 import org.pf.service.dto.UserSettingsDTO;
 import org.pf.web.rest.errors.BadRequestAlertException;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -52,7 +50,7 @@ public class UserSettingsResource {
      */
     @PostMapping("/user-settings")
     @Timed
-    public ResponseEntity<UserSettingsDTO> createUserSettings(@Valid @RequestBody UserSettingsDTO userSettingsDTO) throws URISyntaxException {
+    public ResponseEntity<UserSettingsDTO> createUserSettings(@RequestBody UserSettingsDTO userSettingsDTO) throws URISyntaxException {
         log.debug("REST request to save UserSettings : {}", userSettingsDTO);
         if (userSettingsDTO.getId() != null) {
             throw new BadRequestAlertException("A new userSettings cannot already have an ID", ENTITY_NAME, "idexists");
@@ -74,7 +72,7 @@ public class UserSettingsResource {
      */
     @PutMapping("/user-settings")
     @Timed
-    public ResponseEntity<UserSettingsDTO> updateUserSettings(@Valid @RequestBody UserSettingsDTO userSettingsDTO) throws URISyntaxException {
+    public ResponseEntity<UserSettingsDTO> updateUserSettings(@RequestBody UserSettingsDTO userSettingsDTO) throws URISyntaxException {
         log.debug("REST request to update UserSettings : {}", userSettingsDTO);
         if (userSettingsDTO.getId() == null) {
             return createUserSettings(userSettingsDTO);
@@ -92,12 +90,9 @@ public class UserSettingsResource {
      */
     @GetMapping("/user-settings")
     @Timed
-    public List<UserSettingsDTO> getAllUserSettingsByUser(@RequestParam(required = false, name = "login") String login) {
+    public List<UserSettingsDTO> getAllUserSettings() {
         log.debug("REST request to get all UserSettings");
-        if(login == null) { //WEB only. TEST cases will fail.
-            login = SecurityUtils.getCurrentUserLogin().get();
-        }
-        return userSettingsService.findAllByCurrentUser(login);
+        return userSettingsService.findAll();
         }
 
     /**

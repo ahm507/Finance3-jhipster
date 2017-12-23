@@ -15,10 +15,7 @@
             },
             "detail": {
                 "title": "User Settings"
-            },
-            "usdRate": "Usd Rate",
-            "sarRate": "Sar Rate",
-            "user": "User"
+            }
         }
     }
 }

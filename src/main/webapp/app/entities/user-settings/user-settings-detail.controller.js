@@ -5,9 +5,9 @@
         .module('financeApp')
         .controller('UserSettingsDetailController', UserSettingsDetailController);
 
-    UserSettingsDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'UserSettings', 'User'];
+    UserSettingsDetailController.$inject = ['$scope', '$rootScope', '$stateParams', 'previousState', 'entity', 'UserSettings'];
 
-    function UserSettingsDetailController($scope, $rootScope, $stateParams, previousState, entity, UserSettings, User) {
+    function UserSettingsDetailController($scope, $rootScope, $stateParams, previousState, entity, UserSettings) {
         var vm = this;
 
         vm.userSettings = entity;

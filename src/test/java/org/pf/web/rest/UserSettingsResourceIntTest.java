@@ -1,18 +1,19 @@
 package org.pf.web.rest;
 
+import org.pf.FinanceApp;
+
+import org.pf.domain.UserSettings;
+import org.pf.repository.UserSettingsRepository;
+import org.pf.service.UserSettingsService;
+import org.pf.repository.search.UserSettingsSearchRepository;
+import org.pf.service.dto.UserSettingsDTO;
+import org.pf.service.mapper.UserSettingsMapper;
+import org.pf.web.rest.errors.ExceptionTranslator;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
-import org.pf.FinanceApp;
-import org.pf.domain.User;
-import org.pf.domain.UserSettings;
-import org.pf.repository.UserSettingsRepository;
-import org.pf.repository.search.UserSettingsSearchRepository;
-import org.pf.service.UserSettingsService;
-import org.pf.service.dto.UserSettingsDTO;
-import org.pf.service.mapper.UserSettingsMapper;
-import org.pf.web.rest.errors.ExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -26,9 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.hamcrest.Matchers.*;
-import static org.pf.web.rest.TestUtil.*;
+import static org.pf.web.rest.TestUtil.createFormattingConversionService;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -40,12 +41,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FinanceApp.class)
 public class UserSettingsResourceIntTest {
-
-    private static final Double DEFAULT_USD_RATE = 1D;
-    private static final Double UPDATED_USD_RATE = 2D;
-
-    private static final Double DEFAULT_SAR_RATE = 1D;
-    private static final Double UPDATED_SAR_RATE = 2D;
 
     @Autowired
     private UserSettingsRepository userSettingsRepository;
@@ -93,14 +88,7 @@ public class UserSettingsResourceIntTest {
      * if they test an entity which requires the current entity.
      */
     public static UserSettings createEntity(EntityManager em) {
-        UserSettings userSettings = new UserSettings()
-            .usdRate(DEFAULT_USD_RATE)
-            .sarRate(DEFAULT_SAR_RATE);
-        // Add required entity
-        User user = UserResourceIntTest.createEntity(em);
-        em.persist(user);
-        em.flush();
-        userSettings.setUser(user);
+        UserSettings userSettings = new UserSettings();
         return userSettings;
     }
 
@@ -126,8 +114,6 @@ public class UserSettingsResourceIntTest {
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
         assertThat(userSettingsList).hasSize(databaseSizeBeforeCreate + 1);
         UserSettings testUserSettings = userSettingsList.get(userSettingsList.size() - 1);
-        assertThat(testUserSettings.getUsdRate()).isEqualTo(DEFAULT_USD_RATE);
-        assertThat(testUserSettings.getSarRate()).isEqualTo(DEFAULT_SAR_RATE);
 
         // Validate the UserSettings in Elasticsearch
         UserSettings userSettingsEs = userSettingsSearchRepository.findOne(testUserSettings.getId());
@@ -156,55 +142,15 @@ public class UserSettingsResourceIntTest {
 
     @Test
     @Transactional
-    public void checkUsdRateIsRequired() throws Exception {
-        int databaseSizeBeforeTest = userSettingsRepository.findAll().size();
-        // set the field null
-        userSettings.setUsdRate(null);
-
-        // Create the UserSettings, which fails.
-        UserSettingsDTO userSettingsDTO = userSettingsMapper.toDto(userSettings);
-
-        restUserSettingsMockMvc.perform(post("/api/user-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(userSettingsDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<UserSettings> userSettingsList = userSettingsRepository.findAll();
-        assertThat(userSettingsList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkSarRateIsRequired() throws Exception {
-        int databaseSizeBeforeTest = userSettingsRepository.findAll().size();
-        // set the field null
-        userSettings.setSarRate(null);
-
-        // Create the UserSettings, which fails.
-        UserSettingsDTO userSettingsDTO = userSettingsMapper.toDto(userSettings);
-
-        restUserSettingsMockMvc.perform(post("/api/user-settings")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(userSettingsDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<UserSettings> userSettingsList = userSettingsRepository.findAll();
-        assertThat(userSettingsList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void getAllUserSettingsByUser() throws Exception {
+    public void getAllUserSettings() throws Exception {
         // Initialize the database
         userSettingsRepository.saveAndFlush(userSettings);
 
         // Get all the userSettingsList
-        restUserSettingsMockMvc.perform(get("/api/user-settings?sort=id,desc&login=" + userSettings.getUser().getLogin()))
+        restUserSettingsMockMvc.perform(get("/api/user-settings?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(userSettings.getId().intValue())))
-            .andExpect(jsonPath("$.[*].usdRate").value(hasItem(DEFAULT_USD_RATE.doubleValue())))
-            .andExpect(jsonPath("$.[*].sarRate").value(hasItem(DEFAULT_SAR_RATE.doubleValue())));
+            .andExpect(jsonPath("$.[*].id").value(hasItem(userSettings.getId().intValue())));
     }
 
     @Test
@@ -217,9 +163,7 @@ public class UserSettingsResourceIntTest {
         restUserSettingsMockMvc.perform(get("/api/user-settings/{id}", userSettings.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(userSettings.getId().intValue()))
-            .andExpect(jsonPath("$.usdRate").value(DEFAULT_USD_RATE.doubleValue()))
-            .andExpect(jsonPath("$.sarRate").value(DEFAULT_SAR_RATE.doubleValue()));
+            .andExpect(jsonPath("$.id").value(userSettings.getId().intValue()));
     }
 
     @Test
@@ -242,9 +186,6 @@ public class UserSettingsResourceIntTest {
         UserSettings updatedUserSettings = userSettingsRepository.findOne(userSettings.getId());
         // Disconnect from session so that the updates on updatedUserSettings are not directly saved in db
         em.detach(updatedUserSettings);
-        updatedUserSettings
-            .usdRate(UPDATED_USD_RATE)
-            .sarRate(UPDATED_SAR_RATE);
         UserSettingsDTO userSettingsDTO = userSettingsMapper.toDto(updatedUserSettings);
 
         restUserSettingsMockMvc.perform(put("/api/user-settings")
@@ -256,8 +197,6 @@ public class UserSettingsResourceIntTest {
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
         assertThat(userSettingsList).hasSize(databaseSizeBeforeUpdate);
         UserSettings testUserSettings = userSettingsList.get(userSettingsList.size() - 1);
-        assertThat(testUserSettings.getUsdRate()).isEqualTo(UPDATED_USD_RATE);
-        assertThat(testUserSettings.getSarRate()).isEqualTo(UPDATED_SAR_RATE);
 
         // Validate the UserSettings in Elasticsearch
         UserSettings userSettingsEs = userSettingsSearchRepository.findOne(testUserSettings.getId());
@@ -316,9 +255,7 @@ public class UserSettingsResourceIntTest {
         restUserSettingsMockMvc.perform(get("/api/_search/user-settings?query=id:" + userSettings.getId()))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(userSettings.getId().intValue())))
-            .andExpect(jsonPath("$.[*].usdRate").value(hasItem(DEFAULT_USD_RATE.doubleValue())))
-            .andExpect(jsonPath("$.[*].sarRate").value(hasItem(DEFAULT_SAR_RATE.doubleValue())));
+            .andExpect(jsonPath("$.[*].id").value(hasItem(userSettings.getId().intValue())));
     }
 
     @Test

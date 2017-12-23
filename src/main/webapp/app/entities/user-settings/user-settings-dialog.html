@@ -1,5 +1,5 @@
 
-<form name="editForm" role="form" novalidate ng-submit="vm.save()" show-validation>
+<form name="editForm" role="form" novalidate ng-submit="vm.save()">
 
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
@@ -13,50 +13,7 @@
             <input type="text" class="form-control" id="id" name="id"
                     ng-model="vm.userSettings.id" readonly />
         </div>
-        <div class="form-group">
-            <label class="control-label" data-translate="financeApp.userSettings.usdRate" for="field_usdRate">Usd Rate</label>
-            <input type="number" class="form-control" name="usdRate" id="field_usdRate"
-                    ng-model="vm.userSettings.usdRate"
-                    required/>
-            <div ng-show="editForm.usdRate.$invalid">
-                <p class="help-block"
-                    ng-show="editForm.usdRate.$error.required" data-translate="entity.validation.required">
-                    This field is required.
-                </p>
-                <p class="help-block"
-                    ng-show="editForm.usdRate.$error.number" data-translate="entity.validation.number">
-                    This field should be a number.
-                </p>
-            </div>
-        </div>
-        <div class="form-group">
-            <label class="control-label" data-translate="financeApp.userSettings.sarRate" for="field_sarRate">Sar Rate</label>
-            <input type="number" class="form-control" name="sarRate" id="field_sarRate"
-                    ng-model="vm.userSettings.sarRate"
-                    required/>
-            <div ng-show="editForm.sarRate.$invalid">
-                <p class="help-block"
-                    ng-show="editForm.sarRate.$error.required" data-translate="entity.validation.required">
-                    This field is required.
-                </p>
-                <p class="help-block"
-                    ng-show="editForm.sarRate.$error.number" data-translate="entity.validation.number">
-                    This field should be a number.
-                </p>
-            </div>
-        </div>
 
-        <!--<div class="form-group">-->
-            <!--<label data-translate="financeApp.userSettings.user" for="field_user">User</label>-->
-            <!--<select class="form-control" id="field_user" name="user" ng-model="vm.userSettings.userId" ng-options="user.id as user.login for user in vm.users"             required>-->
-            <!--</select>-->
-        <!--</div>-->
-        <!--<div ng-show="editForm.user.$invalid">-->
-            <!--<p class="help-block"-->
-                <!--ng-show="editForm.user.$error.required" data-translate="entity.validation.required">-->
-                <!--This field is required.-->
-            <!--</p>-->
-        <!--</div>-->
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="vm.clear()">

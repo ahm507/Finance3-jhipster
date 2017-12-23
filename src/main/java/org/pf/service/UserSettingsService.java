@@ -42,10 +42,8 @@ public interface UserSettingsService {
      * Search for the userSettings corresponding to the query.
      *
      * @param query the query of the search
-     *
+     * 
      * @return the list of entities
      */
     List<UserSettingsDTO> search(String query);
-
-    List<UserSettingsDTO> findAllByCurrentUser(String login);
 }

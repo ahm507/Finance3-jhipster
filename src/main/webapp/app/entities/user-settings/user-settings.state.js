@@ -104,8 +104,6 @@
                     resolve: {
                         entity: function () {
                             return {
-                                usdRate: null,
-                                sarRate: null,
                                 id: null
                             };
                         }

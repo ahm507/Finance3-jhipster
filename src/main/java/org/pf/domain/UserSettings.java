@@ -5,7 +5,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.elasticsearch.annotations.Document;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -25,19 +24,6 @@ public class UserSettings implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
-    @Column(name = "usd_rate", nullable = false)
-    private Double usdRate;
-
-    @NotNull
-    @Column(name = "sar_rate", nullable = false)
-    private Double sarRate;
-
-    @OneToOne(optional = false)
-    @NotNull
-    @JoinColumn(unique = true)
-    private User user;
-
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
         return id;
@@ -45,45 +31,6 @@ public class UserSettings implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Double getUsdRate() {
-        return usdRate;
-    }
-
-    public UserSettings usdRate(Double usdRate) {
-        this.usdRate = usdRate;
-        return this;
-    }
-
-    public void setUsdRate(Double usdRate) {
-        this.usdRate = usdRate;
-    }
-
-    public Double getSarRate() {
-        return sarRate;
-    }
-
-    public UserSettings sarRate(Double sarRate) {
-        this.sarRate = sarRate;
-        return this;
-    }
-
-    public void setSarRate(Double sarRate) {
-        this.sarRate = sarRate;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public UserSettings user(User user) {
-        this.user = user;
-        return this;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
@@ -111,8 +58,6 @@ public class UserSettings implements Serializable {
     public String toString() {
         return "UserSettings{" +
             "id=" + getId() +
-            ", usdRate=" + getUsdRate() +
-            ", sarRate=" + getSarRate() +
             "}";
     }
 }

@@ -5,15 +5,14 @@
         .module('financeApp')
         .controller('UserSettingsDialogController', UserSettingsDialogController);
 
-    UserSettingsDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', '$q', 'entity', 'UserSettings', 'User'];
+    UserSettingsDialogController.$inject = ['$timeout', '$scope', '$stateParams', '$uibModalInstance', 'entity', 'UserSettings'];
 
-    function UserSettingsDialogController ($timeout, $scope, $stateParams, $uibModalInstance, $q, entity, UserSettings, User) {
+    function UserSettingsDialogController ($timeout, $scope, $stateParams, $uibModalInstance, entity, UserSettings) {
         var vm = this;
 
         vm.userSettings = entity;
         vm.clear = clear;
         vm.save = save;
-        vm.users = User.query();
 
         $timeout(function (){
             angular.element('.form-group:eq(1)>input').focus();

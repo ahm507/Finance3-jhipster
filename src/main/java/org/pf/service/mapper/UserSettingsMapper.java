@@ -8,15 +8,12 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity UserSettings and its DTO UserSettingsDTO.
  */
-@Mapper(componentModel = "spring", uses = {UserMapper.class})
+@Mapper(componentModel = "spring", uses = {})
 public interface UserSettingsMapper extends EntityMapper<UserSettingsDTO, UserSettings> {
 
-    @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.login", target = "userLogin")
-    UserSettingsDTO toDto(UserSettings userSettings); 
+    
 
-    @Mapping(source = "userId", target = "user")
-    UserSettings toEntity(UserSettingsDTO userSettingsDTO);
+    
 
     default UserSettings fromId(Long id) {
         if (id == null) {
