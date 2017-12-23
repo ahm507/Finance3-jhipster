@@ -130,15 +130,18 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 
 
 ## Database Management
-Change source code and not database, then run:
+* Change source code and not database, then run:
 
     mvn liquibase:diff
 to generate diff file, See Jhipster database at http://www.jhipster.tech/development/#using-a-database
 
-Use the command:
+* Use the command:
     
     mvn liquibase:clearCheckSums
     
 to clear checkSums
 
+* For a complete list of maven Liquibase commands, see:
+
+http://www.liquibase.org/documentation/maven/
 
