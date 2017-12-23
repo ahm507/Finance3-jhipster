@@ -43,6 +43,8 @@ public class UserDTO {
     @Size(min = 2, max = 6)
     private String langKey;
 
+    private Long masterCurrency;
+
     private String createdBy;
 
     private Instant createdDate;
@@ -66,6 +68,7 @@ public class UserDTO {
         this.activated = user.getActivated();
         this.imageUrl = user.getImageUrl();
         this.langKey = user.getLangKey();
+        this.masterCurrency = user.getMasterCurrency();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
         this.lastModifiedBy = user.getLastModifiedBy();
@@ -189,11 +192,20 @@ public class UserDTO {
             ", imageUrl='" + imageUrl + '\'' +
             ", activated=" + activated +
             ", langKey='" + langKey + '\'' +
+            ", masterCurrency='" + masterCurrency + '\'' +
             ", createdBy=" + createdBy +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
             "}";
+    }
+
+    public Long getMasterCurrency() {
+        return masterCurrency;
+    }
+
+    public void setMasterCurrency(Long masterCurrency) {
+        this.masterCurrency = masterCurrency;
     }
 }

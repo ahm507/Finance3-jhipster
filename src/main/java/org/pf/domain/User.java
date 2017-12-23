@@ -69,6 +69,10 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "lang_key", length = 6)
     private String langKey;
 
+    @NotNull
+    @Column(nullable = false)
+    private Long masterCurrency;
+
     @Size(max = 256)
     @Column(name = "image_url", length = 256)
     private String imageUrl;
@@ -242,7 +246,16 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", imageUrl='" + imageUrl + '\'' +
             ", activated='" + activated + '\'' +
             ", langKey='" + langKey + '\'' +
+            ", masterCurrency='" + masterCurrency + '\'' +
             ", activationKey='" + activationKey + '\'' +
             "}";
+    }
+
+    public Long getMasterCurrency() {
+        return masterCurrency;
+    }
+
+    public void setMasterCurrency(Long masterCurrency) {
+        this.masterCurrency = masterCurrency;
     }
 }

@@ -1,18 +1,18 @@
 package org.pf.service;
 
+import org.pf.config.Constants;
 import org.pf.domain.Authority;
+import org.pf.domain.Currency;
 import org.pf.domain.User;
 import org.pf.repository.AuthorityRepository;
+import org.pf.repository.CurrencyRepository;
 import org.pf.repository.PersistentTokenRepository;
-import org.pf.config.Constants;
 import org.pf.repository.UserRepository;
 import org.pf.repository.search.UserSearchRepository;
 import org.pf.security.AuthoritiesConstants;
 import org.pf.security.SecurityUtils;
-import org.pf.service.util.RandomUtil;
 import org.pf.service.dto.UserDTO;
-import org.pf.web.rest.vm.ManagedUserVM;
-
+import org.pf.service.util.RandomUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
@@ -23,10 +23,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +57,11 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialService socialService, UserSearchRepository userSearchRepository, PersistentTokenRepository persistentTokenRepository, AuthorityRepository authorityRepository, CacheManager cacheManager) {
+    private final CurrencyRepository currencyRepository;
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialService socialService,
+        UserSearchRepository userSearchRepository, PersistentTokenRepository persistentTokenRepository,
+        AuthorityRepository authorityRepository, CacheManager cacheManager, CurrencyRepository currencyRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialService = socialService;
@@ -62,6 +69,7 @@ public class UserService {
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
+        this.currencyRepository = currencyRepository;
     }
 
     public Optional<User> activateRegistration(String key) {
@@ -117,6 +125,7 @@ public class UserService {
         newUser.setEmail(userDTO.getEmail());
         newUser.setImageUrl(userDTO.getImageUrl());
         newUser.setLangKey(userDTO.getLangKey());
+        newUser.setMasterCurrency(1L); // This is initial ID that is wrong, but used only to enable initial saving.
         // new user is not active
         newUser.setActivated(false);
         // new user gets registration key
@@ -124,6 +133,7 @@ public class UserService {
         authorities.add(authority);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
+        createInitialCurrency(newUser);
         userSearchRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
@@ -141,6 +151,7 @@ public class UserService {
         } else {
             user.setLangKey(userDTO.getLangKey());
         }
+        user.setMasterCurrency(1L); // This is initial ID that is wrong, but used only to enable initial saving.
         if (userDTO.getAuthorities() != null) {
             Set<Authority> authorities = userDTO.getAuthorities().stream()
                 .map(authorityRepository::findOne)
@@ -153,9 +164,22 @@ public class UserService {
         user.setResetDate(Instant.now());
         user.setActivated(true);
         userRepository.save(user);
+        createInitialCurrency(user);
         userSearchRepository.save(user);
         log.debug("Created Information for User: {}", user);
         return user;
+    }
+
+    private void createInitialCurrency(User user) {
+        Currency initialCurrency = new Currency();
+        initialCurrency.setName("EGP");
+        initialCurrency.setConversionRate(1D);
+        initialCurrency.setUser(user);
+        currencyRepository.save(initialCurrency);
+        //create currency
+        user.setMasterCurrency(initialCurrency.getId());
+        //update user.masterCurrency to the created one.
+        userRepository.save(user);
     }
 
     /**
@@ -167,7 +191,7 @@ public class UserService {
      * @param langKey language key
      * @param imageUrl image URL of user
      */
-    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl) {
+    public void updateUser(String firstName, String lastName, String email, String langKey, String imageUrl, Long masterCurrency) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap(userRepository::findOneByLogin)
             .ifPresent(user -> {
@@ -176,6 +200,7 @@ public class UserService {
                 user.setEmail(email);
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
+                user.setMasterCurrency(masterCurrency);
                 userSearchRepository.save(user);
                 cacheManager.getCache(USERS_CACHE).evict(user.getLogin());
                 log.debug("Changed Information for User: {}", user);
@@ -199,6 +224,7 @@ public class UserService {
                 user.setImageUrl(userDTO.getImageUrl());
                 user.setActivated(userDTO.isActivated());
                 user.setLangKey(userDTO.getLangKey());
+                user.setMasterCurrency(userDTO.getMasterCurrency());
                 Set<Authority> managedAuthorities = user.getAuthorities();
                 managedAuthorities.clear();
                 userDTO.getAuthorities().stream()

@@ -5,15 +5,16 @@
         .module('financeApp')
         .controller('SettingsController', SettingsController);
 
-    SettingsController.$inject = ['Principal', 'Auth', 'JhiLanguageService', '$translate'];
+    SettingsController.$inject = ['Principal', 'Auth', 'JhiLanguageService', '$translate', 'Currency'];
 
-    function SettingsController (Principal, Auth, JhiLanguageService, $translate) {
+    function SettingsController (Principal, Auth, JhiLanguageService, $translate, Currency) {
         var vm = this;
 
         vm.error = null;
         vm.save = save;
         vm.settingsAccount = null;
         vm.success = null;
+        vm.currencies = Currency.query();
 
         /**
          * Store the "settings account" in a separate variable, and not in the shared "account" variable.
@@ -25,7 +26,8 @@
                 firstName: account.firstName,
                 langKey: account.langKey,
                 lastName: account.lastName,
-                login: account.login
+                login: account.login,
+                masterCurrency: account.masterCurrency
             };
         };
 
