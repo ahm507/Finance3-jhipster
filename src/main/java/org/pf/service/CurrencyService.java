@@ -50,4 +50,6 @@ public interface CurrencyService {
     List<CurrencyDTO> findAllByCurrentUser();
 
     List<CurrencyDTO> findAllByCurrentUser(String login);
+
+    boolean isDuplicateName(String userLogin, String name);
 }

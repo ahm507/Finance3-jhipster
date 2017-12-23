@@ -146,4 +146,13 @@ public class CurrencyServiceImpl implements CurrencyService{
             .map(currencyMapper::toDto)
             .collect(Collectors.toList());
     }
+
+    public boolean isDuplicateName(String login, String name) {
+        if(login == null) { //Works with WEB ONLY - NOT TEST CASES. In Test cases, you must pass login parameter
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        List<Currency> list = currencyRepository.findByNameAndUser_Login(name, login);
+        return ! list.isEmpty();
+    }
+
 }

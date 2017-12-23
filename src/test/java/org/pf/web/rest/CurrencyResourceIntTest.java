@@ -1,20 +1,18 @@
 package org.pf.web.rest;
 
-import org.pf.FinanceApp;
-
-import org.pf.domain.Currency;
-import org.pf.domain.User;
-import org.pf.repository.CurrencyRepository;
-import org.pf.service.CurrencyService;
-import org.pf.repository.search.CurrencySearchRepository;
-import org.pf.service.dto.CurrencyDTO;
-import org.pf.service.mapper.CurrencyMapper;
-import org.pf.web.rest.errors.ExceptionTranslator;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.pf.FinanceApp;
+import org.pf.domain.Currency;
+import org.pf.domain.User;
+import org.pf.repository.CurrencyRepository;
+import org.pf.repository.search.CurrencySearchRepository;
+import org.pf.service.CurrencyService;
+import org.pf.service.dto.CurrencyDTO;
+import org.pf.service.mapper.CurrencyMapper;
+import org.pf.web.rest.errors.ExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -28,9 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static org.pf.web.rest.TestUtil.createFormattingConversionService;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
+import static org.pf.web.rest.TestUtil.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -345,5 +343,25 @@ public class CurrencyResourceIntTest {
     public void testEntityFromId() {
         assertThat(currencyMapper.fromId(42L).getId()).isEqualTo(42);
         assertThat(currencyMapper.fromId(null)).isNull();
+    }
+
+    @Test
+    @Transactional
+    public void createDuplicateCurrency() throws Exception {
+        int databaseSizeBeforeCreate = currencyRepository.findAll().size();
+
+        // Create the Currency
+        CurrencyDTO currencyDTO = currencyMapper.toDto(currency);
+        restCurrencyMockMvc.perform(post("/api/currencies")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(currencyDTO)))
+            .andExpect(status().isCreated());
+
+        //That must throw an exception
+        restCurrencyMockMvc.perform(post("/api/currencies")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(currencyDTO)))
+            .andExpect(status().isBadRequest());
+
     }
 }

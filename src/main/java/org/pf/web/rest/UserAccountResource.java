@@ -63,7 +63,6 @@ public class UserAccountResource {
             throw new BadRequestAlertException("A new userAccount cannot already have an ID", ENTITY_NAME, "idexists");
         }
 
-
         if(userAccountService.isDuplicateName(userAccountDTO.getUserLogin(), userAccountDTO.getText())) {
             throw new BadRequestAlertException("Duplicate account name ", ENTITY_NAME, "value.duplicate");
         }

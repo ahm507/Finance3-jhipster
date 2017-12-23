@@ -56,6 +56,11 @@ public class CurrencyResource {
         if (currencyDTO.getId() != null) {
             throw new BadRequestAlertException("A new currency cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        if(currencyService.isDuplicateName(currencyDTO.getUserLogin(), currencyDTO.getName())) {
+            throw new BadRequestAlertException("Duplicate currency name ", ENTITY_NAME, "value.duplicate");
+        }
+
         CurrencyDTO result = currencyService.save(currencyDTO);
         return ResponseEntity.created(new URI("/api/currencies/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
