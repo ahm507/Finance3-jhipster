@@ -105,6 +105,7 @@
                         entity: function () {
                             return {
                                 name: null,
+                                conversionRate: null,
                                 id: null
                             };
                         }

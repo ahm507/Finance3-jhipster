@@ -1,10 +1,10 @@
 package org.pf.service.dto;
 
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
 
 /**
@@ -17,6 +17,10 @@ public class CurrencyDTO implements Serializable {
     @NotNull
     @Size(min = 3, max = 3)
     private String name;
+
+    @NotNull
+    @DecimalMin(value = "0.000001")
+    private Double conversionRate;
 
     private Long userId;
 
@@ -36,6 +40,14 @@ public class CurrencyDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Double getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(Double conversionRate) {
+        this.conversionRate = conversionRate;
     }
 
     public Long getUserId() {
@@ -80,6 +92,7 @@ public class CurrencyDTO implements Serializable {
         return "CurrencyDTO{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", conversionRate=" + getConversionRate() +
             "}";
     }
 }

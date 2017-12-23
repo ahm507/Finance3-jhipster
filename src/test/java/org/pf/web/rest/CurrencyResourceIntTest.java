@@ -44,6 +44,9 @@ public class CurrencyResourceIntTest {
     private static final String DEFAULT_NAME = "AAA";
     private static final String UPDATED_NAME = "BBB";
 
+    private static final Double DEFAULT_CONVERSION_RATE = 0.000001D;
+    private static final Double UPDATED_CONVERSION_RATE = 1D;
+
     @Autowired
     private CurrencyRepository currencyRepository;
 
@@ -91,7 +94,8 @@ public class CurrencyResourceIntTest {
      */
     public static Currency createEntity(EntityManager em) {
         Currency currency = new Currency()
-            .name(DEFAULT_NAME);
+            .name(DEFAULT_NAME)
+            .conversionRate(DEFAULT_CONVERSION_RATE);
         // Add required entity
         User user = UserResourceIntTest.createEntity(em);
         em.persist(user);
@@ -123,6 +127,7 @@ public class CurrencyResourceIntTest {
         assertThat(currencyList).hasSize(databaseSizeBeforeCreate + 1);
         Currency testCurrency = currencyList.get(currencyList.size() - 1);
         assertThat(testCurrency.getName()).isEqualTo(DEFAULT_NAME);
+        assertThat(testCurrency.getConversionRate()).isEqualTo(DEFAULT_CONVERSION_RATE);
 
         // Validate the Currency in Elasticsearch
         Currency currencyEs = currencySearchRepository.findOne(testCurrency.getId());
@@ -170,16 +175,36 @@ public class CurrencyResourceIntTest {
 
     @Test
     @Transactional
-    public void getAllCurrenciesOfUser() throws Exception {
+    public void checkConversionRateIsRequired() throws Exception {
+        int databaseSizeBeforeTest = currencyRepository.findAll().size();
+        // set the field null
+        currency.setConversionRate(null);
+
+        // Create the Currency, which fails.
+        CurrencyDTO currencyDTO = currencyMapper.toDto(currency);
+
+        restCurrencyMockMvc.perform(post("/api/currencies")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(currencyDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Currency> currencyList = currencyRepository.findAll();
+        assertThat(currencyList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    public void getAllCurrencies() throws Exception {
         // Initialize the database
         currencyRepository.saveAndFlush(currency);
 
         // Get all the currencyList
-        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc&login="+ currency.getUser().getLogin()))
+        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())))
+            .andExpect(jsonPath("$.[*].conversionRate").value(hasItem(DEFAULT_CONVERSION_RATE.doubleValue())));
     }
 
 //    @Test
@@ -208,7 +233,8 @@ public class CurrencyResourceIntTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.id").value(currency.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME.toString()))
+            .andExpect(jsonPath("$.conversionRate").value(DEFAULT_CONVERSION_RATE.doubleValue()));
     }
 
     @Test
@@ -232,7 +258,8 @@ public class CurrencyResourceIntTest {
         // Disconnect from session so that the updates on updatedCurrency are not directly saved in db
         em.detach(updatedCurrency);
         updatedCurrency
-            .name(UPDATED_NAME);
+            .name(UPDATED_NAME)
+            .conversionRate(UPDATED_CONVERSION_RATE);
         CurrencyDTO currencyDTO = currencyMapper.toDto(updatedCurrency);
 
         restCurrencyMockMvc.perform(put("/api/currencies")
@@ -245,6 +272,7 @@ public class CurrencyResourceIntTest {
         assertThat(currencyList).hasSize(databaseSizeBeforeUpdate);
         Currency testCurrency = currencyList.get(currencyList.size() - 1);
         assertThat(testCurrency.getName()).isEqualTo(UPDATED_NAME);
+        assertThat(testCurrency.getConversionRate()).isEqualTo(UPDATED_CONVERSION_RATE);
 
         // Validate the Currency in Elasticsearch
         Currency currencyEs = currencySearchRepository.findOne(testCurrency.getId());

@@ -17,6 +17,7 @@
                 "title": "Currency"
             },
             "name": "Name",
+            "conversionRate": "Conversion Rate",
             "user": "User"
         }
     }

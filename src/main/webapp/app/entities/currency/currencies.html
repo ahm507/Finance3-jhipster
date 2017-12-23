@@ -37,7 +37,8 @@
                 <tr>
                     <th><span data-translate="global.field.id">ID</span></th>
                     <th><span data-translate="financeApp.currency.name">Name</span></th>
-                    <!--<th><span data-translate="financeApp.currency.user">User</span></th>-->
+                    <th><span data-translate="financeApp.currency.conversionRate">Conversion Rate</span></th>
+                    <th><span data-translate="financeApp.currency.user">User</span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -45,11 +46,18 @@
                 <tr ng-repeat="currency in vm.currencies track by currency.id">
                     <td><a ui-sref="currency-detail({id:currency.id})">{{currency.id}}</a></td>
                     <td>{{currency.name}}</td>
+                    <td>{{currency.conversionRate}}</td>
                     <!--<td>-->
                         <!--{{currency.userLogin}}-->
                     <!--</td>-->
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
+                            <!--<button type="submit"-->
+                                    <!--ui-sref="currency-detail({id:currency.id})"-->
+                                    <!--class="btn btn-info btn-sm">-->
+                                <!--<span class="glyphicon glyphicon-eye-open"></span>-->
+                                <!--<span class="hidden-sm-down" data-translate="entity.action.view"></span>-->
+                            <!--</button>-->
                             <button type="submit"
                                     ui-sref="currency.edit({id:currency.id})"
                                     class="btn btn-primary btn-sm">

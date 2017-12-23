@@ -30,6 +30,11 @@ public class Currency implements Serializable {
     @Column(name = "name", length = 3, nullable = false)
     private String name;
 
+    @NotNull
+    @DecimalMin(value = "0.000001")
+    @Column(name = "conversion_rate", nullable = false)
+    private Double conversionRate;
+
     @ManyToOne(optional = false)
     @NotNull
     private User user;
@@ -54,6 +59,19 @@ public class Currency implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Double getConversionRate() {
+        return conversionRate;
+    }
+
+    public Currency conversionRate(Double conversionRate) {
+        this.conversionRate = conversionRate;
+        return this;
+    }
+
+    public void setConversionRate(Double conversionRate) {
+        this.conversionRate = conversionRate;
     }
 
     public User getUser() {
@@ -95,6 +113,7 @@ public class Currency implements Serializable {
         return "Currency{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", conversionRate=" + getConversionRate() +
             "}";
     }
 }

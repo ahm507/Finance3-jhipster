@@ -33,6 +33,26 @@
                 </p>
             </div>
         </div>
+        <div class="form-group">
+            <label class="control-label" data-translate="financeApp.currency.conversionRate" for="field_conversionRate">Conversion Rate</label>
+            <input type="number" class="form-control" name="conversionRate" id="field_conversionRate"
+                    ng-model="vm.currency.conversionRate"
+                    required min="0.000001"/>
+            <div ng-show="editForm.conversionRate.$invalid">
+                <p class="help-block"
+                    ng-show="editForm.conversionRate.$error.required" data-translate="entity.validation.required">
+                    This field is required.
+                </p>
+                <p class="help-block"
+                    ng-show="editForm.conversionRate.$error.min" data-translate="entity.validation.min" translate-value-min="0.000001">
+                    This field should be at least 0.000001.
+                </p>
+                <p class="help-block"
+                    ng-show="editForm.conversionRate.$error.number" data-translate="entity.validation.number">
+                    This field should be a number.
+                </p>
+            </div>
+        </div>
 
         <!--<div class="form-group">-->
             <!--<label data-translate="financeApp.currency.user" for="field_user">User</label>-->
