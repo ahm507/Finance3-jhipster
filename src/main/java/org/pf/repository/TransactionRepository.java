@@ -16,16 +16,7 @@ import java.time.ZonedDateTime;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-//    @Query("select transaction from Transaction transaction where transaction.user.login = ?#{principal.username}")
-//    List<Transaction> findByUserIsCurrentUser();
-
-    @Query("select transaction from Transaction transaction "
-        + "where transaction.user.login = ?1 AND "
-        + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
-        + "order by date ASC")
-    Page<Transaction> findByUserLoginAndAccountId(String login, Long userAccountId, Pageable pageable);
-
-
+    //FIXME: remove the below API as it is not used
     Page<Transaction> findByUser_Login(String login, Pageable pageable);
 
     @Query(value = "SELECT min(r.date) FROM Transaction r where r.user.login = ?1")
@@ -40,5 +31,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         + "AND (t.date BETWEEN ?3 AND ?4) "
         + "ORDER BY t.date")
     Page<Transaction> findByLoginAndAccountIdAndYear(String login, Long userAccountId, ZonedDateTime fromDate, ZonedDateTime toDate, Pageable pageable);
+
+    @Query("select transaction from Transaction transaction "
+        + "where transaction.user.login = ?1 AND "
+        + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
+        + "order by date ASC")
+    Page<Transaction> findByUserLoginAndAccountId(String login, Long userAccountId, Pageable pageable);
 
 }
