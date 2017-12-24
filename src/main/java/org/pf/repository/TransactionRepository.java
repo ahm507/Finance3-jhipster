@@ -16,9 +16,6 @@ import java.time.ZonedDateTime;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    //FIXME: remove the below API as it is not used
-    Page<Transaction> findByUser_Login(String login, Pageable pageable);
-
     @Query(value = "SELECT min(r.date) FROM Transaction r where r.user.login = ?1")
     ZonedDateTime queryMinDate(String login);
 
