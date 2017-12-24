@@ -11,6 +11,7 @@
                 "currency": "Currency",
                 "userAccount": "User Account",
                 "transaction": "Transaction",
+                "charts": "Charts",
                 "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
             },
             "account": {

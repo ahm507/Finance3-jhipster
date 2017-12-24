@@ -1,0 +1,21 @@
+{
+    "financeApp": {
+        "charts" : {
+            "home": {
+                "title": "Charts",
+                "createLabel": "Create a new Charts",
+                "createOrEditLabel": "Create or edit a Charts",
+                "search": "Search for Charts"
+            },
+            "created": "A new Charts is created with identifier {{ param }}",
+            "updated": "A Charts is updated with identifier {{ param }}",
+            "deleted": "A Charts is deleted with identifier {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to delete Charts {{ id }}?"
+            },
+            "detail": {
+                "title": "Charts"
+            }
+        }
+    }
+}
