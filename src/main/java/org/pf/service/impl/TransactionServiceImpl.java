@@ -201,9 +201,12 @@ public class TransactionServiceImpl implements TransactionService{
 
     private void computeBalance(long accountId, AccountType type, Page<TransactionDTO> transactions,
         double initialBalance) {
+        computeBalance(accountId, type, initialBalance, transactions.getContent());
+    }
 
+    public double computeBalance(long accountId, AccountType type, double initialBalance,
+        List<TransactionDTO> listOfTrans) {
         double bal = initialBalance;
-        List<TransactionDTO> listOfTrans = transactions.getContent();
         for (TransactionDTO transactionDTO : listOfTrans) {
             //            listOfTans.get(i).getBalance()
             if (transactionDTO.getWithdrawAccountId().equals(accountId)) {
@@ -213,7 +216,7 @@ public class TransactionServiceImpl implements TransactionService{
             }
             transactionDTO.setBalance(transactionDTO.getBalance() + bal);
         }
-
+        return bal;
     }
 
     public static String formatMoney(double number) {
@@ -231,6 +234,7 @@ public class TransactionServiceImpl implements TransactionService{
             int minYear = minDate.getYear();
             int maxYear = maxDate.getYear();
             ArrayList<String> years = new ArrayList<>();
+            //FIXME: How come year list includes one space string " "
             years.add(" "); //All years, means no filter
             for(int y = minYear; y <= maxYear; y++) {
                 years.add(String.valueOf(y));
@@ -304,7 +308,6 @@ public class TransactionServiceImpl implements TransactionService{
     }
 
     public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable) {
-
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
         if(userAccount.getType() == AccountType.ASSET || userAccount.getType() == AccountType.LIABILITY) {
             return findYearTransactionsForAssetAndLiability(login, userAccountId, year, pageable);
@@ -318,5 +321,6 @@ public class TransactionServiceImpl implements TransactionService{
         return (userAccountRepository.findOne(depositId).getCurrency().getId() !=
             userAccountRepository.findOne(withdrawId).getCurrency().getId());
     }
+
 
 }

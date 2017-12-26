@@ -5,38 +5,37 @@
         .module('financeApp')
         .controller('ChartsController', ChartsController);
 
-    ChartsController.$inject = ['Charts', 'ChartsSearch'];
+    ChartsController.$inject = ['Charts', 'ChartsSearch', '$sce', '$http'];
 
-    function ChartsController(Charts, ChartsSearch) {
+    function ChartsController(Charts, ChartsSearch, $sce, $http) {
 
         var vm = this;
-
-        vm.charts = [];
-        vm.clear = clear;
-        vm.search = search;
         vm.loadAll = loadAll;
 
         loadAll();
 
         function loadAll() {
-            Charts.query(function(result) {
-                vm.charts = result;
-                vm.searchQuery = null;
-            });
+
+             $http({
+                  method: 'GET',
+                  url: 'api/chartsHtml',
+                  transformResponse: function (value) {
+                    return value; //no transformation
+                  }
+                }).then(function successCallback(response) {
+                    vm.chartHtml = $sce.trustAsHtml(response.data);
+                    // when the response is available
+                  }, function errorCallback(response) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                    alert(response);
+                  });
+
+
+
+
         }
 
-        function search() {
-            if (!vm.searchQuery) {
-                return vm.loadAll();
+
             }
-            ChartsSearch.query({query: vm.searchQuery}, function(result) {
-                vm.charts = result;
-                vm.currentSearch = vm.searchQuery;
-            });
-        }
-
-        function clear() {
-            vm.searchQuery = null;
-            loadAll();
-        }    }
 })();

@@ -1,5 +1,6 @@
 package org.pf.service;
 
+import org.pf.domain.enumeration.AccountType;
 import org.pf.service.dto.TransactionDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,4 +59,8 @@ public interface TransactionService {
     public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable);
 
     boolean isInvalidCurrencies(TransactionDTO transactionDTO);
+
+    double computeBalance(long accountId, AccountType type, double initialBalance,
+        List<TransactionDTO> listOfTrans);
+
 }

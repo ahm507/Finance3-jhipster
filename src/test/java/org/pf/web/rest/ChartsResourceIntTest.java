@@ -1,21 +1,22 @@
 package org.pf.web.rest;
 
-import org.pf.FinanceApp;
-
-import org.pf.domain.Charts;
-import org.pf.repository.ChartsRepository;
-import org.pf.service.ChartsService;
-import org.pf.repository.search.ChartsSearchRepository;
-import org.pf.web.rest.errors.ExceptionTranslator;
-
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.pf.FinanceApp;
+import org.pf.domain.Currency;
+import org.pf.domain.Transaction;
+import org.pf.domain.User;
+import org.pf.domain.UserAccount;
+import org.pf.domain.enumeration.AccountType;
+import org.pf.repository.search.TransactionSearchRepository;
+import org.pf.service.ChartsService;
+import org.pf.web.rest.errors.ExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,13 +24,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.List;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
-import static org.pf.web.rest.TestUtil.createFormattingConversionService;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.pf.web.rest.TestUtil.*;
 
 /**
  * Test class for the ChartsResource REST controller.
@@ -41,13 +41,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ChartsResourceIntTest {
 
     @Autowired
-    private ChartsRepository chartsRepository;
+    private TransactionSearchRepository transactionSearchRepository;
 
     @Autowired
     private ChartsService chartsService;
-
-    @Autowired
-    private ChartsSearchRepository chartsSearchRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -63,7 +60,7 @@ public class ChartsResourceIntTest {
 
     private MockMvc restChartsMockMvc;
 
-    private Charts charts;
+//    private Charts charts;
 
     @Before
     public void setup() {
@@ -82,184 +79,172 @@ public class ChartsResourceIntTest {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Charts createEntity(EntityManager em) {
-        Charts charts = new Charts();
-        return charts;
-    }
+//    public static Charts createEntity(EntityManager em) {
+//
+//        return null;
+//    }
+    User user;
 
     @Before
     public void initTest() {
-        chartsSearchRepository.deleteAll();
-        charts = createEntity(em);
+        transactionSearchRepository.deleteAll();
+        user = createUser();
+        em.persist(user);
+        em.flush();
+        Currency egp = createCurrency(user, "egp", 1.0);
+        em.flush();
+        user.setMasterCurrency(egp.getId());
+        em.persist(user);
+        em.flush();
+        Currency usd = createCurrency(user, "usd", 20.0);
+        em.flush();
+        UserAccount asset1 = createUserAccount(user, "asset1", AccountType.ASSET, egp);
+        UserAccount income1 = createUserAccount(user, "income1", AccountType.INCOME, egp);
+        UserAccount expense1 = createUserAccount(user, "expense1", AccountType.EXPENSE, egp);
+        UserAccount liability1 = createUserAccount(user, "liability1", AccountType.LIABILITY, egp);
+        UserAccount other1 = createUserAccount(user, "other1", AccountType.OTHER, usd);
+        em.flush();
+
+        //TODO: extract into DateUtils
+
+        ZonedDateTime date1 = ZonedDateTime.parse("2017-01-01 01:01:01.0", DateTimeFormatter.ofPattern(
+                "yyyy-MM-dd HH:mm:ss.S").withZone(ZoneId.systemDefault()));
+//        ZonedDateTime date2 = ZonedDateTime.parse("2016-01-01 02:02:02.0", DateTimeFormatter.ofPattern(
+//            "yyyy-MM-dd HH:mm:ss.S").withZone(ZoneId.systemDefault()));
+
+        createTransaction(user, date1, 100.0, asset1, income1);
+        createTransaction(user, date1, 100.0, asset1, income1);
+        createTransaction(user, date1, 100.0, asset1, expense1);
+        createTransaction(user, date1, 100.0, asset1, expense1);
+        createTransaction(user, date1, 100.0, asset1, expense1);
+        createTransaction(user, date1, 100.0, liability1, other1);
+        createTransaction(user, date1, 100.0, liability1, other1);
+        createTransaction(user, date1, 100.0, other1, liability1);
+        em.flush();
+    }
+
+    private final String DEFAULT_LOGIN = "test1";
+
+    public User createUser() {
+        final String DEFAULT_EMAIL = "test1@localhost";
+        final String DEFAULT_FIRSTNAME = "john";
+        final String DEFAULT_LASTNAME = "doe";
+        final String DEFAULT_IMAGEURL = "http://placehold.it/50x50";
+        final String DEFAULT_LANGKEY = "en";
+        User user = new User();
+        user.setLogin(DEFAULT_LOGIN + RandomStringUtils.randomAlphabetic(5));
+        user.setPassword(RandomStringUtils.random(60));
+        user.setActivated(true);
+        user.setEmail(RandomStringUtils.randomAlphabetic(5) + DEFAULT_EMAIL);
+        user.setFirstName(DEFAULT_FIRSTNAME);
+        user.setLastName(DEFAULT_LASTNAME);
+        user.setImageUrl(DEFAULT_IMAGEURL);
+        user.setLangKey(DEFAULT_LANGKEY);
+        return user;
+    }
+
+    public Currency createCurrency(User user, String name, double conversionRate) {
+        Currency currency = new Currency()
+            .name(name)
+            .conversionRate(conversionRate);
+        // Add required entity
+//        User user = UserResourceIntTest.createEntity(em);
+        currency.setUser(user);
+        em.persist(currency);
+        return currency;
+    }
+
+    public UserAccount createUserAccount(User user, String text, AccountType type, Currency currency) {
+        UserAccount userAccount = new UserAccount()
+            .text(text)
+            .description("")
+            .type(type);
+        // Add required entity
+//        User user = UserResourceIntTest.createEntity(em);
+//        em.persist(user);
+//        em.flush();
+        userAccount.setUser(user);
+        // Add required entity
+//        Currency currency = CurrencyResourceIntTest.createEntity(em);
+//        em.persist(currency);
+//        em.flush();
+        userAccount.setCurrency(currency);
+        em.persist(userAccount);
+        return userAccount;
+    }
+
+    public Transaction createTransaction(User user, ZonedDateTime date, double amount,
+        UserAccount withdrawAccount, UserAccount depositAccount) {
+        Transaction transaction = new Transaction()
+            .date(date)
+            .amount(amount)
+            .description(" ");
+        // Add required entity
+        transaction.setUser(user);
+        // Add required entity
+//        UserAccount withdrawAccount = UserAccountResourceIntTest.createEntity(em);
+//        em.persist(withdrawAccount);
+//        em.flush();
+        transaction.setWithdrawAccount(withdrawAccount);
+        // Add required entity
+//        UserAccount depositAccount = UserAccountResourceIntTest.createEntity(em);
+//        em.persist(depositAccount);
+//        em.flush();
+        transaction.setDepositAccount(depositAccount);
+        em.persist(transaction);
+        return transaction;
     }
 
     @Test
     @Transactional
-    public void createCharts() throws Exception {
-        int databaseSizeBeforeCreate = chartsRepository.findAll().size();
+    public void charts() throws Exception {
 
-        // Create the Charts
-        restChartsMockMvc.perform(post("/api/charts")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(charts)))
-            .andExpect(status().isCreated());
+        String html = chartsService.getTransactionsTrendHtml("2017", "ASSET", user.getLogin());
+        assertThat(html)
+            .isNotEmpty()
+            .contains("<tr><td>Feb</td><td>-500.0</td><td>-500.0</td></tr>");
 
-        // Validate the Charts in the database
-        List<Charts> chartsList = chartsRepository.findAll();
-        assertThat(chartsList).hasSize(databaseSizeBeforeCreate + 1);
-        Charts testCharts = chartsList.get(chartsList.size() - 1);
+        html = chartsService.getTransactionsTrendHtml("", "", user.getLogin());
+        assertThat(html)
+            .isNotEmpty()
+            .contains("<tr><td>2017</td><td>300.0</td><td>0.0</td><td>0.0</td><td>-200.0</td></tr>");
 
-        // Validate the Charts in Elasticsearch
-        Charts chartsEs = chartsSearchRepository.findOne(testCharts.getId());
-        assertThat(chartsEs).isEqualToComparingFieldByField(testCharts);
+        html = chartsService.getTransactionsTrendHtml("2017", "EXPENSE", user.getLogin());
+        assertThat(html)
+            .isNotEmpty()
+            .contains("<tr><td>Jan</td><td>300.0</td><td>300.0</td></tr>");
+
+
+        html = chartsService.getTransactionsTrendHtml("2017", "LIABILITY", user.getLogin());
+        assertThat(html)
+            .isNotEmpty()
+            .contains("<tr><td>Feb</td><td>100.0</td><td>100.0</td></tr>");
+
+        html = chartsService.getTransactionsTrendHtml("2017", "INCOME", user.getLogin());
+        assertThat(html)
+            .isNotEmpty()
+            .contains("<tr><td>Jan</td><td>-200.0</td><td>-200.0</td></tr>");
+
+
+
+
+        //        int databaseSizeBeforeCreate = chartsRepository.findAll().size();
+//
+//        // Create the Charts
+//        restChartsMockMvc.perform(post("/api/charts")
+//            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+//            .content(TestUtil.convertObjectToJsonBytes(charts)))
+//            .andExpect(status().isCreated());
+//
+//        // Validate the Charts in the database
+//        List<Charts> chartsList = chartsRepository.findAll();
+//        assertThat(chartsList).hasSize(databaseSizeBeforeCreate + 1);
+//        Charts testCharts = chartsList.get(chartsList.size() - 1);
+//
+//        // Validate the Charts in Elasticsearch
+//        Charts chartsEs = chartsSearchRepository.findOne(testCharts.getId());
+//        assertThat(chartsEs).isEqualToComparingFieldByField(testCharts);
     }
 
-    @Test
-    @Transactional
-    public void createChartsWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = chartsRepository.findAll().size();
 
-        // Create the Charts with an existing ID
-        charts.setId(1L);
-
-        // An entity with an existing ID cannot be created, so this API call must fail
-        restChartsMockMvc.perform(post("/api/charts")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(charts)))
-            .andExpect(status().isBadRequest());
-
-        // Validate the Charts in the database
-        List<Charts> chartsList = chartsRepository.findAll();
-        assertThat(chartsList).hasSize(databaseSizeBeforeCreate);
-    }
-
-    @Test
-    @Transactional
-    public void getAllCharts() throws Exception {
-        // Initialize the database
-        chartsRepository.saveAndFlush(charts);
-
-        // Get all the chartsList
-        restChartsMockMvc.perform(get("/api/charts?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(charts.getId().intValue())));
-    }
-
-    @Test
-    @Transactional
-    public void getCharts() throws Exception {
-        // Initialize the database
-        chartsRepository.saveAndFlush(charts);
-
-        // Get the charts
-        restChartsMockMvc.perform(get("/api/charts/{id}", charts.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(charts.getId().intValue()));
-    }
-
-    @Test
-    @Transactional
-    public void getNonExistingCharts() throws Exception {
-        // Get the charts
-        restChartsMockMvc.perform(get("/api/charts/{id}", Long.MAX_VALUE))
-            .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @Transactional
-    public void updateCharts() throws Exception {
-        // Initialize the database
-        chartsService.save(charts);
-
-        int databaseSizeBeforeUpdate = chartsRepository.findAll().size();
-
-        // Update the charts
-        Charts updatedCharts = chartsRepository.findOne(charts.getId());
-        // Disconnect from session so that the updates on updatedCharts are not directly saved in db
-        em.detach(updatedCharts);
-
-        restChartsMockMvc.perform(put("/api/charts")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(updatedCharts)))
-            .andExpect(status().isOk());
-
-        // Validate the Charts in the database
-        List<Charts> chartsList = chartsRepository.findAll();
-        assertThat(chartsList).hasSize(databaseSizeBeforeUpdate);
-        Charts testCharts = chartsList.get(chartsList.size() - 1);
-
-        // Validate the Charts in Elasticsearch
-        Charts chartsEs = chartsSearchRepository.findOne(testCharts.getId());
-        assertThat(chartsEs).isEqualToComparingFieldByField(testCharts);
-    }
-
-    @Test
-    @Transactional
-    public void updateNonExistingCharts() throws Exception {
-        int databaseSizeBeforeUpdate = chartsRepository.findAll().size();
-
-        // Create the Charts
-
-        // If the entity doesn't have an ID, it will be created instead of just being updated
-        restChartsMockMvc.perform(put("/api/charts")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(charts)))
-            .andExpect(status().isCreated());
-
-        // Validate the Charts in the database
-        List<Charts> chartsList = chartsRepository.findAll();
-        assertThat(chartsList).hasSize(databaseSizeBeforeUpdate + 1);
-    }
-
-    @Test
-    @Transactional
-    public void deleteCharts() throws Exception {
-        // Initialize the database
-        chartsService.save(charts);
-
-        int databaseSizeBeforeDelete = chartsRepository.findAll().size();
-
-        // Get the charts
-        restChartsMockMvc.perform(delete("/api/charts/{id}", charts.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
-            .andExpect(status().isOk());
-
-        // Validate Elasticsearch is empty
-        boolean chartsExistsInEs = chartsSearchRepository.exists(charts.getId());
-        assertThat(chartsExistsInEs).isFalse();
-
-        // Validate the database is empty
-        List<Charts> chartsList = chartsRepository.findAll();
-        assertThat(chartsList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchCharts() throws Exception {
-        // Initialize the database
-        chartsService.save(charts);
-
-        // Search the charts
-        restChartsMockMvc.perform(get("/api/_search/charts?query=id:" + charts.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(charts.getId().intValue())));
-    }
-
-    @Test
-    @Transactional
-    public void equalsVerifier() throws Exception {
-        TestUtil.equalsVerifier(Charts.class);
-        Charts charts1 = new Charts();
-        charts1.setId(1L);
-        Charts charts2 = new Charts();
-        charts2.setId(charts1.getId());
-        assertThat(charts1).isEqualTo(charts2);
-        charts2.setId(2L);
-        assertThat(charts1).isNotEqualTo(charts2);
-        charts1.setId(null);
-        assertThat(charts1).isNotEqualTo(charts2);
-    }
 }

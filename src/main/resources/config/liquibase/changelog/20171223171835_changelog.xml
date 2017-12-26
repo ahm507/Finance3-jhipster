@@ -1,9 +1,0 @@
-<?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-    <changeSet author="Macpro (generated)" id="1514049526460-1">
-        <dropUniqueConstraint constraintName="user_id" tableName="jhi_social_user_connection"/>
-    </changeSet>
-    <changeSet author="Macpro (generated)" id="1514049526460-2">
-        <dropUniqueConstraint constraintName="user_id_2" tableName="jhi_social_user_connection"/>
-    </changeSet>
-</databaseChangeLog>

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * Spring Data JPA repository for the Transaction entity.
@@ -34,5 +35,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
         + "order by date ASC")
     Page<Transaction> findByUserLoginAndAccountId(String login, Long userAccountId, Pageable pageable);
+
+    @Query("select transaction from Transaction transaction "
+        + "where transaction.user.login = ?1 AND "
+        + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
+        + "order by date ASC")
+    List<Transaction> findByUserLoginAndAccountId(String login, Long userAccountId);
+
+
+    @Query("SELECT t FROM Transaction t "
+        + "where t.user.login=?1 "
+        + "AND (t.date BETWEEN ?2 AND ?3) "
+        + "ORDER BY t.date")
+    List<Transaction> findByUserLoginAndDateBetween(String login, ZonedDateTime fromDate, ZonedDateTime toDate);
+
+
+
 
 }

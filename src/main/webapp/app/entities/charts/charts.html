@@ -3,7 +3,7 @@
     <jhi-alert></jhi-alert>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-xs-4 no-padding-left">
+<!--             <div class="col-xs-4 no-padding-left">
                 <button class="btn btn-primary" ui-sref="charts.new" >
                     <span class="glyphicon glyphicon-plus"></span>
                     <span class="hidden-xs-down"  data-translate="financeApp.charts.home.createLabel">
@@ -11,7 +11,8 @@
                     </span>
                 </button>
             </div>
-            <div class="col-xs-8 no-padding-right">
+ -->
+            <!--  <div class="col-xs-8 no-padding-right">
                 <form name="searchForm" class="form-inline">
                     <div class="input-group pull-right" >
                         <input type="text" class="form-control" ng-model="vm.searchQuery" id="searchQuery" placeholder="{{ 'financeApp.charts.home.search' | translate }}">
@@ -27,12 +28,12 @@
                         </span>
                     </div>
                 </form>
-            </div>
+            </div> -->
         </div>
     </div>
     <br/>
     <div class="table-responsive">
-        <table class="jh-table table table-striped">
+        <!-- <table class="jh-table table table-striped">
             <thead>
                 <tr>
                     <th><span data-translate="global.field.id">ID</span></th>
@@ -67,5 +68,9 @@
                 </tr>
             </tbody>
         </table>
+        -->
+        <!-- This is a preformated html at server side -->
+        <div ng-bind-html="vm.chartHtml"></div>
+
     </div>
 </div>
