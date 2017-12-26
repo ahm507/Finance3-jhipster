@@ -46,15 +46,9 @@ public class ChartsResource {
             login = SecurityUtils.getCurrentUserLogin().get();
         }
 
-        if(type == null) {
-            type = "EXPENSE";
-        }
+        return chartsService.getTransactionsTrendHtml(year, type, login);
 
-        String out = chartsService.getTransactionsTrendHtml(year, type, login);
-
-        return out;
-
-        }
+    }
 
 
 
