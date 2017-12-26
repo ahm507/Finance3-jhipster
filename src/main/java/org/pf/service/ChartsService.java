@@ -60,7 +60,7 @@ public class ChartsService {
 
     public String getTransactionsTrendHtml(@Nullable String year, @NotNull String type, @NotNull String login) throws Exception {
         List<Map<String, Object>> out2;
-        if(year == null) {
+        if(year == null || year.isEmpty()) {
             out2 = getExpensesTrendForAllYears(login) ;
         } else {
             out2 = getExpensesTrend(year, type, login);
@@ -73,7 +73,7 @@ public class ChartsService {
         boolean headerRendered = false;
         StringBuffer stringBuffer = new StringBuffer();
         if(year == null) year = "all";
-        stringBuffer.append("<h1>email: "+ login + ", type: " + type + ", for year: " + year + "</h1>\r\n");
+//        stringBuffer.append("<h1>email: "+ login + ", type: " + type + ", for year: " + year + "</h1>\r\n");
         stringBuffer.append("<table border=\"1\">");
         for(Map<String, Object> map : out2) {
             Set<String> keys = map.keySet();
@@ -133,14 +133,11 @@ public class ChartsService {
 
     private Map<String, Map<String, Object>> getTrendDataAllYears(String login) throws Exception {
 
-//        usdRate = userRepo.findByEmail(email).getUsd_rate();
-//        sarRate = userRepo.findByEmail(email).getSar_rate();
         return getTotalsAllYearsAllAccountTypes(login);
     }
 
     private Map<String, Map<String, Object>> getTotalsAllYearsAllAccountTypes(String login) throws Exception {
         // Add All years Entries
-        //        List<Map<String, Object>> out = new ArrayList<Map<String, Object>>();
         Map<String, Map<String, Object>> out = new HashMap<>();
         List<String> years = transactionService.getYearList(login);
         //FIXME: I have to remove first " " as it is not a year actually.
@@ -370,8 +367,6 @@ public class ChartsService {
 
     //1 based date is sent
     private double fetchMonthBalance(String year, String month, List<TransactionDTO> ts) throws Exception {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        Date myDate = sdf.parse(year + "-" + String.valueOf(month + 1) + "-01"); //the first invalid date
         ZonedDateTime myDate = getStartDate(year, month);
         double balance = 0;
         for (TransactionDTO t : ts) {
