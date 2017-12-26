@@ -25,14 +25,7 @@
                 }).then(function successCallback(response) {
                     vm.chartHtml = $sce.trustAsHtml(response.data);
                     // when the response is available
-                  }, function errorCallback(response) {
-                    // called asynchronously if an error occurs
-                    // or server returns response with an error status.
-                    alert(response);
                   });
-
-
-
 
         }
 
