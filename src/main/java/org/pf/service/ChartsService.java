@@ -31,18 +31,20 @@ import java.util.Set;
 @Transactional
 public class ChartsService {
 
+    public static final String MONTH = "Month";
+    public static final String TOTAL = "Total";
     private final Logger log = LoggerFactory.getLogger(ChartsService.class);
 
-    static public final String CAT_INCOME = "Income";
-    static public final String CAT_LIABILITIES = "Liabilities";
-    static public final String CAT_EXPENSES = "Expenses";
-    static public final String CAT_ASSETS = "Assets";
-    static public final String CAT_OTHER = "Other";
+    static final String CAT_INCOME = "Income";
+    static final String CAT_LIABILITIES = "Liabilities";
+    static final String CAT_EXPENSES = "Expenses";
+    static final String CAT_ASSETS = "Assets";
+    static final String CAT_OTHER = "Other";
 
-    public static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
-    public static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
+    static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
+    static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
 
-    final String TOTALS = "totals";
+    static final String TOTALS = "totals";
 
     private TransactionService transactionService;
     private UserAccountRepository userAccountRepository;
@@ -65,42 +67,41 @@ public class ChartsService {
         } else {
             out2 = getExpensesTrend(year, type, login);
         }
-        String string = convertToHtml(year, type, login, out2);
-        return string;
+        return convertToHtml(year, type, login, out2);
     }
 
     private String convertToHtml(String year, String type, String login, List<Map<String, Object>> out2) {
         boolean headerRendered = false;
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
         if(year == null) year = "all";
-//        stringBuffer.append("<h1>email: "+ login + ", type: " + type + ", for year: " + year + "</h1>\r\n");
-        stringBuffer.append("<table border=\"1\">");
+//        stringBuilder.append("<h1>email: "+ login + ", type: " + type + ", for year: " + year + "</h1>\r\n");
+        stringBuilder.append("<table border=\"1\">");
         for(Map<String, Object> map : out2) {
             Set<String> keys = map.keySet();
             if( ! headerRendered) {
                 headerRendered = true;
-                convertHeaderHtml(stringBuffer, keys);
+                convertHeaderHtml(stringBuilder, keys);
             }
-            convertRowHtml(stringBuffer, map, keys);
+            convertRowHtml(stringBuilder, map, keys);
         }
-        stringBuffer.append("</table>");
-        return stringBuffer.toString();
+        stringBuilder.append("</table>");
+        return stringBuilder.toString();
     }
 
-    private void convertHeaderHtml(StringBuffer stringBuffer, Set<String> keys) {
-        stringBuffer.append("<tr>");
+    private void convertHeaderHtml(StringBuilder stringBuilder, Set<String> keys) {
+        stringBuilder.append("<tr>");
         for(String key : keys) {
-            stringBuffer.append("<td>" + key + "</td>");
+            stringBuilder.append("<td>" + key + "</td>");
         }
-        stringBuffer.append("</tr>\r\n");
+        stringBuilder.append("</tr>\r\n");
     }
 
-    private void convertRowHtml(StringBuffer stringBuffer, Map<String, Object> map, Set<String> keys) {
-        stringBuffer.append("<tr>");
+    private void convertRowHtml(StringBuilder stringBuilder, Map<String, Object> map, Set<String> keys) {
+        stringBuilder.append("<tr>");
         for(String key : keys) {
-            stringBuffer.append("<td>" + map.get(key) + "</td>");
+            stringBuilder.append("<td>" + map.get(key) + "</td>");
         }
-        stringBuffer.append("</tr>\r\n");
+        stringBuilder.append("</tr>\r\n");
     }
 
     private List<Map<String,Object>> getExpensesTrendForAllYears(String login) throws Exception {
@@ -144,7 +145,7 @@ public class ChartsService {
         years.remove(0);
         for (String yearString : years) {
             HashMap<String, Object> year = new HashMap<>();
-            year.put("Month", yearString);
+            year.put(MONTH, yearString);
             year.put(CAT_ASSETS, 0.0);        //initialization
             year.put(CAT_LIABILITIES, 0.0);    //initialization
             out.put(yearString, year);
@@ -174,7 +175,7 @@ public class ChartsService {
 
     private void getTotalsAllYears(String login,
         List<String> years, AccountType accountType, String totalName,
-        Map<String, Map<String, Object>> out) throws Exception {
+        Map<String, Map<String, Object>> out) {
 
         List<UserAccount> expenseAccounts = userAccountRepository.findByUser_LoginAndTypeOrderByText
             (login, accountType);
@@ -280,7 +281,7 @@ public class ChartsService {
         List<Map<String, Object>> out = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
             HashMap<String, Object> month = new HashMap<>();
-            month.put("Month", getMonthName(i + 1));
+            month.put(MONTH, getMonthName(i + 1));
             month.put(CAT_ASSETS, 0.0);        //initialization
             month.put(CAT_LIABILITIES, 0.0);    //initialization
             out.add(month);
@@ -317,7 +318,7 @@ public class ChartsService {
 
     private void getTotalSummation(String login,
         String year, AccountType type, String totalName,
-        List<Map<String, Object>> out) throws Exception {
+        List<Map<String, Object>> out) {
         List<UserAccount> accounts = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, type);
         for (int monthIndex = 1; monthIndex <= 12; monthIndex++) {
 //            List<TransactionDTO> transactions = transactionService.getYearMonthTransactions(login, year, monthIndex); //for all accounts
@@ -340,15 +341,14 @@ public class ChartsService {
         List<Map<String, Object>> balanceData = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
             HashMap<String, Object> month = new HashMap<>();
-            month.put("Month", getMonthName(i + 1));
-            month.put("Total", 0.0);
+            month.put(MONTH, getMonthName(i + 1));
+            month.put(TOTAL, 0.0);
             balanceData.add(month);
         }
         //determine interval, smallest and largest date
         List<UserAccount> accounts = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, type);
         for (UserAccount account : accounts) {
             //Get all transactions with computed balance
-//            List<TransactionDTO> transactions = transactionService.getTransactions(login, account.getId());
             List<TransactionDTO> transactions = transactionMapper.toDto(
                 transactionRepository.findByUserLoginAndAccountId(login, account.getId()));
             transactionService.computeBalance(account.getId(), account.getType(), 0, transactions);
@@ -357,8 +357,8 @@ public class ChartsService {
                 monthBal *= account.getCurrency().getConversionRate();
                 Map<String, Object> map = balanceData.get(month);
                 map.put(account.getText(), monthBal);
-                Double total = (Double) map.get("Total");
-                map.put("Total", total + monthBal);
+                Double total = (Double) map.get(TOTAL);
+                map.put(TOTAL, total + monthBal);
             }
         }
 
@@ -366,11 +366,10 @@ public class ChartsService {
     }
 
     //1 based date is sent
-    private double fetchMonthBalance(String year, String month, List<TransactionDTO> ts) throws Exception {
+    private double fetchMonthBalance(String year, String month, List<TransactionDTO> ts) {
         ZonedDateTime myDate = getStartDate(year, month);
         double balance = 0;
         for (TransactionDTO t : ts) {
-//            Date transDate = sdf.parse(t.getDate());
             if (t.getDate().isBefore(myDate)) {
                 balance = t.getBalance();
             } else {
@@ -382,8 +381,7 @@ public class ChartsService {
 
     //PRIVATE
     //Income & Expenses
-    private List<Map<String, Object>> getDataSummation(String login, String year, AccountType type)
-        throws Exception {
+    private List<Map<String, Object>> getDataSummation(String login, String year, AccountType type) {
         List<Map<String, Object>> out = new ArrayList<>();
         //for all months
         List<UserAccount> accs = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, type);
@@ -394,7 +392,7 @@ public class ChartsService {
                 getStartDate(year, String.valueOf(month)), getEndDate(year, String.valueOf(month))));
             //for all accounts
             HashMap<String, Object> map = new HashMap<>();
-            map.put("Month", getMonthName(month));
+            map.put(MONTH, getMonthName(month));
             double monthTotal = 0;
             for (UserAccount a : accs) {
                 double balance = transactionService.computeBalance(a.getId(), a.getType(), 0, trans);
@@ -403,7 +401,7 @@ public class ChartsService {
                 map.put(a.getText(), balance);
                 monthTotal += balance;
             }
-            map.put("Total", monthTotal);
+            map.put(TOTAL, monthTotal);
             out.add(map);
         }
         return out;
