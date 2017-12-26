@@ -69,8 +69,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @Column(name = "lang_key", length = 6)
     private String langKey;
 
-    @NotNull
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long masterCurrency;
 
     @Size(max = 256)

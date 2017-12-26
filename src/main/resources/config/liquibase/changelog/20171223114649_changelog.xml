@@ -10,7 +10,7 @@
     <changeSet author="Ahmed Hammad" id="1514029622352-3">
         <addColumn tableName="jhi_user">
             <column name="master_currency" type="long">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>
