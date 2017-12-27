@@ -1,8 +1,6 @@
 package org.pf.repository;
 
 import org.pf.domain.Transaction;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -28,13 +26,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         + "AND (t.withdrawAccount.id =?2 OR t.depositAccount.id =?2) "
         + "AND (t.date BETWEEN ?3 AND ?4) "
         + "ORDER BY t.date")
-    Page<Transaction> findByLoginAndAccountIdAndYear(String login, Long userAccountId, ZonedDateTime fromDate, ZonedDateTime toDate, Pageable pageable);
-
-    @Query("select transaction from Transaction transaction "
-        + "where transaction.user.login = ?1 AND "
-        + "(transaction.withdrawAccount.id = ?2 OR transaction.depositAccount.id = ?2) "
-        + "order by date ASC")
-    Page<Transaction> findByUserLoginAndAccountId(String login, Long userAccountId, Pageable pageable);
+    List<Transaction> findByLoginAndAccountIdAndYear(String login, Long userAccountId, ZonedDateTime fromDate, ZonedDateTime toDate);
 
     @Query("select transaction from Transaction transaction "
         + "where transaction.user.login = ?1 AND "

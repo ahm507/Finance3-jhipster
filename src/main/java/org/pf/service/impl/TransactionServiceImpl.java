@@ -93,31 +93,27 @@ public class TransactionServiceImpl implements TransactionService{
     /**
      * Get all the transactions.
      *
-     * @param pageable the pagination information
      * @return the list of entities
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<TransactionDTO> findAll(Pageable pageable) {
+    public List<TransactionDTO> findAll() {
         log.debug("Request to get all Transactions");
-        return transactionRepository.findAll(pageable)
-            .map(transactionMapper::toDto);
+        return transactionMapper.toDto(transactionRepository.findAll());
     }
 
 
     /**
      * Get all the transactions.
      *
-     * @param pageable the pagination information
      * @return the list of entities
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<TransactionDTO> findByUserLoginAndAccountId(String login, long userAccountId, Pageable pageable) {
+    public List<TransactionDTO> findByUserLoginAndAccountId(String login, long userAccountId) {
         log.debug("Request to get all Transactions");
 
-        Page<TransactionDTO> transactions = transactionRepository.findByUserLoginAndAccountId(login, userAccountId, pageable)
-            .map(transactionMapper::toDto);
+        List<TransactionDTO> transactions = transactionMapper.toDto(transactionRepository.findByUserLoginAndAccountId(login, userAccountId));
 
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
         computeBalance(userAccountId, userAccount.getType(), transactions, 0);
@@ -156,7 +152,6 @@ public class TransactionServiceImpl implements TransactionService{
      * Search for the transaction corresponding to the query.
      *
      * @param query the query of the search
-     * @param pageable the pagination information
      * @return the list of entities
      */
     @Override
@@ -199,9 +194,9 @@ public class TransactionServiceImpl implements TransactionService{
         }
     }
 
-    private void computeBalance(long accountId, AccountType type, Page<TransactionDTO> transactions,
+    private void computeBalance(long accountId, AccountType type, List<TransactionDTO> transactions,
         double initialBalance) {
-        computeBalance(accountId, type, initialBalance, transactions.getContent());
+        computeBalance(accountId, type, initialBalance, transactions);
     }
 
     public double computeBalance(long accountId, AccountType type, double initialBalance,
@@ -254,7 +249,7 @@ public class TransactionServiceImpl implements TransactionService{
         return new ArrayList<>(); //empty list
     }
 
-    private Page<TransactionDTO> findYearTransactionsForIncomeAndExepnses(String login, Long userAccountId, Long year, Pageable pageable) {
+    private List<TransactionDTO> findYearTransactionsForIncomeAndExepnses(String login, Long userAccountId, Long year) {
         log.debug("Request to get all Transactions of account and in some year");
 
             ZonedDateTime fromDate = ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
@@ -264,15 +259,15 @@ public class TransactionServiceImpl implements TransactionService{
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
 
-        Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, userAccountId, fromDate, toDate, pageable)
-            .map(transactionMapper::toDto);
+        List<TransactionDTO> transactions = transactionMapper.toDto(
+            transactionRepository.findByLoginAndAccountIdAndYear(login, userAccountId, fromDate, toDate));
 
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
         computeBalance(userAccountId, userAccount.getType(), transactions, 0);
         return transactions;
     }
 
-    private  Page<TransactionDTO> findYearTransactionsForAssetAndLiability(String login, Long accountId, Long year, Pageable pageable) {
+    private  List<TransactionDTO> findYearTransactionsForAssetAndLiability(String login, Long accountId, Long year) {
 
         //1) Get ppast years transactions to get past balance
         ZonedDateTime fromDate = ZonedDateTime.parse("1900-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
@@ -281,15 +276,14 @@ public class TransactionServiceImpl implements TransactionService{
         ZonedDateTime toDate = ZonedDateTime.parse((year-1) + END_OF_MONTH_STRING, DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        Page<TransactionDTO> transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, fromDate, toDate, pageable)
-            .map(transactionMapper::toDto);
+        List<TransactionDTO> transactions = transactionMapper.toDto(transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, fromDate, toDate));
 
         UserAccount userAccount = userAccountRepository.findOne(accountId);
         computeBalance(accountId, userAccount.getType(), transactions, 0);
         //Might be there is no past transactions
         Double pastBalance = 0D;
-        if(! transactions.getContent().isEmpty()) {
-            pastBalance = transactions.getContent().get(transactions.getContent().size() - 1).getBalance();
+        if(! transactions.isEmpty()) {
+            pastBalance = transactions.get(transactions.size() - 1).getBalance();
         }
 
         //2) Get this year transactions
@@ -300,19 +294,18 @@ public class TransactionServiceImpl implements TransactionService{
         ZonedDateTime thisYearEnd   = ZonedDateTime.parse(year + END_OF_MONTH_STRING, DateTimeFormatter.ofPattern(
             YYYY_MM_DD_HH_MM_SS_S).withZone(
             ZoneId.systemDefault()));
-        transactions = transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, thisYearStart, thisYearEnd, pageable)
-            .map(transactionMapper::toDto);
+        transactions = transactionMapper.toDto(transactionRepository.findByLoginAndAccountIdAndYear(login, accountId, thisYearStart, thisYearEnd));
 
         computeBalance(accountId, userAccount.getType(), transactions, pastBalance);
         return transactions;
     }
 
-    public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable) {
+    public List<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year) {
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
         if(userAccount.getType() == AccountType.ASSET || userAccount.getType() == AccountType.LIABILITY) {
-            return findYearTransactionsForAssetAndLiability(login, userAccountId, year, pageable);
+            return findYearTransactionsForAssetAndLiability(login, userAccountId, year);
         }
-        return findYearTransactionsForIncomeAndExepnses(login, userAccountId, year, pageable);
+        return findYearTransactionsForIncomeAndExepnses(login, userAccountId, year);
     }
 
     public boolean isInvalidCurrencies(TransactionDTO transactionDTO) {

@@ -23,12 +23,11 @@ public interface TransactionService {
     /**
      * Get all the transactions.
      *
-     * @param pageable the pagination information
      * @return the list of entities
      */
-    Page<TransactionDTO> findAll(Pageable pageable);
+    List<TransactionDTO> findAll();
 
-    public Page<TransactionDTO> findByUserLoginAndAccountId(String lgin, long userAccountId, Pageable pageable);
+    public List<TransactionDTO> findByUserLoginAndAccountId(String lgin, long userAccountId);
 
     /**
      * Get the "id" transaction.
@@ -49,14 +48,13 @@ public interface TransactionService {
      * Search for the transaction corresponding to the query.
      *
      * @param query the query of the search
-     * @param pageable the pagination information
      * @return the list of entities
      */
     Page<TransactionDTO> search(String query, Pageable pageable);
 
     public List<String> getYearList(String login);
 
-    public Page<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year, Pageable pageable);
+    public List<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year);
 
     boolean isInvalidCurrencies(TransactionDTO transactionDTO);
 

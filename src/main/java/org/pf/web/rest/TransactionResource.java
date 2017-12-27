@@ -119,12 +119,11 @@ public class TransactionResource {
     /**
      * GET  /transactions : get all the transactions.
      *
-     * @param pageable the pagination information
      * @return the ResponseEntity with status 200 (OK) and the list of transactions in body
      */
     @GetMapping("/transactions")
     @Timed
-    public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable,
+    public List<TransactionDTO> getAllTransactions(
         @RequestParam(required = false, value = "login") String login,
         @RequestParam(required = false, value = "userAccountId") Long userAccountId,
         @RequestParam(required = false, value = "year") Long year) {
@@ -133,21 +132,22 @@ public class TransactionResource {
         if(login == null) { //TEST cases must send login
             login = SecurityUtils.getCurrentUserLogin().get();
         }
-        Page<TransactionDTO> page;
+        List<TransactionDTO> page;
         if(userAccountId == null && year == null) {
             throw new NotImplementedException(); //Not needed actually
         } else if (year == null){
-            page = transactionService.findByUserLoginAndAccountId(login, userAccountId, pageable);
+            page = transactionService.findByUserLoginAndAccountId(login, userAccountId);
         } else if (userAccountId == null ) {
             throw new NotImplementedException(); //Not needed actually
         } else {
             //both are not null
-            page = transactionService.findYearTransactions(login, userAccountId, year, pageable);
+            page = transactionService.findYearTransactions(login, userAccountId, year);
         }
         //log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
-        log.debug("Getting transactions for userAccountID={0}, count={1}" ,userAccountId, page.getTotalElements());
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+        log.debug("Getting transactions for userAccountID={0}, count={1}" ,userAccountId, page.size());
+//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
+//        return new ResponseEntity<>(page, headers, HttpStatus.OK);
+        return page;
     }
 
     /**

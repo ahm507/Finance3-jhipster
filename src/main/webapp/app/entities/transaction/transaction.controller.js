@@ -89,8 +89,9 @@
                 }
 
                 function onSuccess(data, headers) {
-                    vm.links = ParseLinks.parse(headers('link'));
-                    vm.totalItems = headers('X-Total-Count');
+//                     Removed pagination
+//                     vm.links = ParseLinks.parse(headers('link'));
+//                     vm.totalItems = headers('X-Total-Count');
                     vm.transactions = []; //empty the array
                     for (var i = 0; i < data.length; i++) {
                         vm.transactions.push(data[i]);
