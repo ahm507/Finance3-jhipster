@@ -54,7 +54,7 @@ public class ChartsService {
         this.transactionMapper = transactionMapper;
     }
 
-    public String getTransactionsTrendHtml(String year, String type, @NotNull String login) throws Exception {
+    public String getTransactionsTrendHtml(String year, String type, @NotNull String login) {
         List<Map<String, Object>> out2;
         if(year == null || year.isEmpty() || year.equals(" ")) {
             out2 = getTrendDataForAllYears(login) ;
@@ -90,15 +90,13 @@ public class ChartsService {
 
     private void convertRowHtml(StringBuilder stringBuilder, Map<String, Object> map, Set<String> keys) {
         stringBuilder.append("<tr>");
-//        String[] stringKeys = keys.toArray(new String[1]);
-//        Arrays.sort(stringKeys);
         for(String key : keys) {
             stringBuilder.append("<td>" + map.get(key) + "</td>");
         }
         stringBuilder.append("</tr>\r\n");
     }
 
-    private List<Map<String,Object>> getTrendDataForAllYears(String login) throws Exception {
+    private List<Map<String,Object>> getTrendDataForAllYears(String login) {
         Map<String, Map<String, Object>> out = getTotalsAllYearsAllAccountTypes(login);
         List<Map<String, Object>> out2 = new ArrayList<>();
         //convert map to array for html/JS compatibility
@@ -109,11 +107,10 @@ public class ChartsService {
         return out2;
     }
 
-    private Map<String, Map<String, Object>> getTotalsAllYearsAllAccountTypes(String login) throws Exception {
+    private Map<String, Map<String, Object>> getTotalsAllYearsAllAccountTypes(String login) {
         // Add All years Entries
         Map<String, Map<String, Object>> out = new HashMap<>();
         List<String> years = transactionService.getYearList(login);
-        //FIXME: I have to remove first " " as it is not a year actually.
         years.remove(0);
         for (String yearString : years) {
             HashMap<String, Object> year = new HashMap<>();
@@ -177,7 +174,7 @@ public class ChartsService {
 
     private void getTotalsWithBalance(String login,
         List<String> years, String type, String totalName,
-        Map<String, Map<String, Object>> out) throws Exception {
+        Map<String, Map<String, Object>> out) {
         List<UserAccount> accounts = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, AccountType.valueOf(type));
         for (UserAccount account : accounts) {
             //Get all transactions with computed balance
@@ -215,7 +212,7 @@ public class ChartsService {
     }
 
     private List<Map<String, Object>> getTrendData(String login, String year,
-        String type) throws Exception {
+        String type) {
         if (type == null || type.isEmpty()) {
             return getTrendDataTotals(login, year);
         }
@@ -228,7 +225,7 @@ public class ChartsService {
     }
 
 
-    private List<Map<String, Object>> getTrendDataTotals(String login, String year) throws Exception {
+    private List<Map<String, Object>> getTrendDataTotals(String login, String year) {
         // Add Months Entries
         List<Map<String, Object>> out = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
@@ -275,7 +272,7 @@ public class ChartsService {
     //In Assets and Liabilities, we must compute balance from the very start up to the target month
     //So the looping should be based on complete Account history
     private List<Map<String, Object>> getTrendDataBalances(String login, String year,
-        String type) throws Exception {
+        String type) {
         List<Map<String, Object>> balanceData = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
             HashMap<String, Object> month = new HashMap<>();
