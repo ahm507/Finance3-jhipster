@@ -74,7 +74,7 @@
             <div class="container-fluid">
         <div class="row">
             <div class="col-xs-4 no-padding-left">
-                <label data-translate="financeApp.charts.yearList" >Year List</label>
+                <label data-translate="financeApp.charts.home.yearList" >Year List</label>
                 <select class="form-control" id="field_yearList" name="yearList"
                     ng-model="vm.yearSelected"
                     ng-options="yearList as yearList for yearList in vm.yearList"
@@ -84,10 +84,10 @@
             </div>
        
             <div class="col-xs-8 no-padding-right">
-             <label data-translate="financeApp.charts.accountType" for="field_accountType">Account List</label>
+             <label data-translate="financeApp.charts.home.accountType" for="field_accountType">Account Types</label>
                 <select class="form-control" id="field_accountType" name="accountType"
                     ng-model="vm.accountTypeSelected"
-                    ng-options="account as account for account in vm.accountTypes"
+                    ng-options="accountType as accountType for accountType in vm.accountTypes"
                     ng-change="vm.changedSelection()"
                     required>
                 </select>
@@ -97,6 +97,7 @@
 
         <br>
         <br>
+        <hr>
 
         <!-- This is a preformated html at server side -->
         <div ng-bind-html="vm.chartHtml"></div>

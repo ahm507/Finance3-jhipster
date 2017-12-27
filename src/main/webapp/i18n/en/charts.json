@@ -5,7 +5,9 @@
                 "title": "Charts",
                 "createLabel": "Create a new Charts",
                 "createOrEditLabel": "Create or edit a Charts",
-                "search": "Search for Charts"
+                "search": "Search for Charts",
+                "yearList": "Year List",
+                "accountType": "Account Types"
             },
             "created": "A new Charts is created with identifier {{ param }}",
             "updated": "A Charts is updated with identifier {{ param }}",

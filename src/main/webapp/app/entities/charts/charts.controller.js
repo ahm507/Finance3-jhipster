@@ -13,7 +13,17 @@
         vm.loadAll = loadAll;
         vm.changedSelection = changedSelection;
 
+        vm.yearSelected = localStorage.getItem("charts_yearSelected");
+        vm.accountTypeSelected = localStorage.getItem("charts_accountTypeSelected");
+        if(vm.accountTypeSelected == "undefined") {
+            vm.accountTypeSelected = "";
+        }
+
+
         function changedSelection() {
+            localStorage.setItem("charts_yearSelected", vm.yearSelected);
+            localStorage.setItem("charts_accountTypeSelected", vm.accountTypeSelected);
+            
             loadAll();
         }
 
