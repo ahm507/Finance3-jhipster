@@ -12,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.constraints.NotNull;
 import java.text.DateFormatSymbols;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -125,21 +123,18 @@ public class ChartsService {
         getTotalsAllYears(login, years, CAT_OTHER, CAT_OTHER, out);
         getTotalsWithBalance(login, years, CAT_ASSET, CAT_ASSET, out);
         getTotalsWithBalance(login, years, CAT_LIABILITY, CAT_LIABILITY, out);
-
-
         return out;
     }
 
     private void getTotalsAllYears(String login,
         List<String> years, String type, String totalName,
         Map<String, Map<String, Object>> out) {
-
         List<UserAccount> expenseAccounts = userAccountRepository.findByUser_LoginAndTypeOrderByText
             (login, AccountType.valueOf(type));
-
         for (String year : years) {
-            List<Transaction> t1 = transactionRepository.findByUserLoginAndDateBetween(login, getStartDate(year),
-                getEndDate(year));
+            List<Transaction> t1 = transactionRepository.findByUserLoginAndDateBetween(login, DateHelper
+                    .getStartDate(year),
+                DateHelper.getEndDate(year));
             List<TransactionDTO> transactions = transactionMapper.toDto(t1);
             double total = 0;
             for (UserAccount account : expenseAccounts) {
@@ -148,28 +143,6 @@ public class ChartsService {
             }
             out.get(year).put(totalName, total);
         }
-    }
-
-    //TODO: extract into DateUtils
-    private ZonedDateTime getStartDate(String year) {
-        return ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
-            YYYY_MM_DD_HH_MM_SS_S).withZone(ZoneId.systemDefault()));
-    }
-
-    private ZonedDateTime getEndDate(String year) {
-        return ZonedDateTime.parse(year + END_OF_MONTH_STRING, DateTimeFormatter.ofPattern(
-            YYYY_MM_DD_HH_MM_SS_S).withZone(ZoneId.systemDefault()));
-    }
-
-    private ZonedDateTime getStartDate(String year, String month) {
-        String dateString = String.format("%s-%02d-01 00:00:00.0", year, Integer.parseInt(month));
-        return ZonedDateTime.parse(dateString, DateTimeFormatter.ofPattern(
-            YYYY_MM_DD_HH_MM_SS_S).withZone(ZoneId.systemDefault()));
-    }
-
-    private ZonedDateTime getEndDate(String year, String month) {
-        return ZonedDateTime.parse(String.format("%s-%02d-31 23:59:59.0", year, Integer.parseInt(month)), DateTimeFormatter.ofPattern(
-            YYYY_MM_DD_HH_MM_SS_S).withZone(ZoneId.systemDefault()));
     }
 
     private void getTotalsWithBalance(String login,
@@ -194,7 +167,7 @@ public class ChartsService {
     //1 based date is sent
     private double fetchYearBalance(String year, List<TransactionDTO> transactions) {
         String yearPlus = String.valueOf(Integer.parseInt(year) + 1);
-        ZonedDateTime myDate = getZonedDateTime(Integer.parseInt(yearPlus));
+        ZonedDateTime myDate = DateHelper.getZonedDateTime(Integer.parseInt(yearPlus));
         double balance = 0;
         for (TransactionDTO transaction : transactions) {
             if (transaction.getDate().isBefore(myDate)) {
@@ -204,11 +177,6 @@ public class ChartsService {
             }
         }
         return balance;
-    }
-
-    private ZonedDateTime getZonedDateTime(Integer year) {
-        return ZonedDateTime.parse(year + "-01-01 00:00:00.0", DateTimeFormatter.ofPattern(
-                  YYYY_MM_DD_HH_MM_SS_S).withZone(ZoneId.systemDefault()));
     }
 
     private List<Map<String, Object>> getTrendData(String login, String year,
@@ -223,7 +191,6 @@ public class ChartsService {
         //income and expenses
         return getDataSummation(login, year, type);
     }
-
 
     private List<Map<String, Object>> getTrendDataTotals(String login, String year) {
         // Add Months Entries
@@ -256,9 +223,9 @@ public class ChartsService {
         List<Map<String, Object>> out) {
         List<UserAccount> accounts = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, type);
         for (int monthIndex = 1; monthIndex <= 12; monthIndex++) {
-//            List<TransactionDTO> transactions = transactionService.getYearMonthTransactions(login, year, monthIndex); //for all accounts
             List<TransactionDTO> transactions = transactionMapper.toDto(transactionRepository.findByUserLoginAndDateBetween(login,
-                getStartDate(year, String.valueOf(monthIndex)), getEndDate(year, String.valueOf(monthIndex))));
+                DateHelper.getStartDate(year, String.valueOf(monthIndex)), DateHelper
+                    .getEndDate(year, String.valueOf(monthIndex))));
 
             double total = 0;
             for (UserAccount account : accounts) {
@@ -302,7 +269,7 @@ public class ChartsService {
 
     //1 based date is sent
     private double fetchMonthBalance(String year, String month, List<TransactionDTO> ts) {
-        ZonedDateTime myDate = getEndDate(year, month);
+        ZonedDateTime myDate = DateHelper.getEndDate(year, month);
         double balance = 0;
         for (TransactionDTO t : ts) {
             if (t.getDate().isBefore(myDate)) {
@@ -324,7 +291,8 @@ public class ChartsService {
             //get month transaction
             //List<TransactionDTO> trans = transactionService.getYearMonthTransactions(login, year, month); //for all accounts
             List<TransactionDTO> trans = transactionMapper.toDto(transactionRepository.findByUserLoginAndDateBetween(login,
-                getStartDate(year, String.valueOf(month)), getEndDate(year, String.valueOf(month))));
+                DateHelper.getStartDate(year, String.valueOf(month)), DateHelper
+                    .getEndDate(year, String.valueOf(month))));
             //for all accounts
             HashMap<String, Object> map = new HashMap<>();
             map.put(MONTH, getMonthName(month));
