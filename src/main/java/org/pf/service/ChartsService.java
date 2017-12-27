@@ -64,11 +64,11 @@ public class ChartsService {
         return convertToHtml(out2);
     }
 
-    private String convertToHtml(List<Map<String, Object>> out2) {
+    private String convertToHtml(List<Map<String, Object>> data) {
         boolean headerRendered = false;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<table border=\"1\">");
-        for(Map<String, Object> map : out2) {
+        for(Map<String, Object> map : data) {
             Set<String> keys = map.keySet();
             if( ! headerRendered) {
                 headerRendered = true;
@@ -90,6 +90,8 @@ public class ChartsService {
 
     private void convertRowHtml(StringBuilder stringBuilder, Map<String, Object> map, Set<String> keys) {
         stringBuilder.append("<tr>");
+//        String[] stringKeys = keys.toArray(new String[1]);
+//        Arrays.sort(stringKeys);
         for(String key : keys) {
             stringBuilder.append("<td>" + map.get(key) + "</td>");
         }
@@ -123,8 +125,10 @@ public class ChartsService {
 
         getTotalsAllYears(login, years, CAT_EXPENSE, CAT_EXPENSE, out);
         getTotalsAllYears(login, years, CAT_INCOME, CAT_INCOME, out);
+        getTotalsAllYears(login, years, CAT_OTHER, CAT_OTHER, out);
         getTotalsWithBalance(login, years, CAT_ASSET, CAT_ASSET, out);
         getTotalsWithBalance(login, years, CAT_LIABILITY, CAT_LIABILITY, out);
+
 
         return out;
     }
@@ -237,6 +241,7 @@ public class ChartsService {
 
         getTotalSummation(login, year, AccountType.EXPENSE, CAT_EXPENSE, out);
         getTotalSummation(login, year, AccountType.INCOME, CAT_INCOME, out);
+        getTotalSummation(login, year, AccountType.OTHER, CAT_OTHER, out);
         getTotalsWithBalanceForSingleYear(login, year, AccountType.ASSET, CAT_ASSET, out);
         getTotalsWithBalanceForSingleYear(login, year, AccountType.LIABILITY, CAT_LIABILITY, out);
         return out;
