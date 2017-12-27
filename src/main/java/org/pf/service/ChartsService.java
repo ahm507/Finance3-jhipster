@@ -7,8 +7,6 @@ import org.pf.repository.TransactionRepository;
 import org.pf.repository.UserAccountRepository;
 import org.pf.service.dto.TransactionDTO;
 import org.pf.service.mapper.TransactionMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +30,11 @@ public class ChartsService {
 
     public static final String MONTH = "Month";
     public static final String TOTAL = "Total";
-    private final Logger log = LoggerFactory.getLogger(ChartsService.class);
-
     static final String CAT_INCOME = "INCOME";
     static final String CAT_LIABILITY = "LIABILITY";
     static final String CAT_EXPENSE = "EXPENSE";
     static final String CAT_ASSET = "ASSET";
     static final String CAT_OTHER = "OTHER";
-
     static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
     static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
 
@@ -130,8 +125,6 @@ public class ChartsService {
         getTotalsAllYears(login, years, CAT_INCOME, CAT_INCOME, out);
         getTotalsWithBalance(login, years, CAT_ASSET, CAT_ASSET, out);
         getTotalsWithBalance(login, years, CAT_LIABILITY, CAT_LIABILITY, out);
-        //Add OTHER category
-        //getTotalsWithBalance(login, years, CAT_OTHER, CAT_OTHER, out);
 
         return out;
     }

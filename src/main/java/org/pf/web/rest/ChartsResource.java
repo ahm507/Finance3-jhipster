@@ -19,8 +19,6 @@ public class ChartsResource {
 
     private final Logger log = LoggerFactory.getLogger(ChartsResource.class);
 
-    private static final String ENTITY_NAME = "charts";
-
     private final ChartsService chartsService;
 
     public ChartsResource(ChartsService chartsService) {
