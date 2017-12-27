@@ -129,5 +129,5 @@
         "negative.value": "Amount is not allowed to be less than zero",
         "currency.value": "Transactions should be between consistent currencies"
     },
-    "footer": "This is your footer"
+    "footer": "This project is open sourced, visit https://github.com/ahm507/Finance3"
 }
