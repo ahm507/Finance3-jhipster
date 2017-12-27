@@ -27,4 +27,8 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     List<UserAccount> findByUser_LoginOrderByTypeAsc(String login);
 
     List<UserAccount> findByUser_LoginAndTypeOrderByText(String login, AccountType accountType);
+
+    List<UserAccount> findByUser_LoginAndTextAndType(String login, String name, AccountType accountType);
+
+    void deleteByUser_Login(String login);
 }

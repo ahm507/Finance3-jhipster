@@ -33,8 +33,6 @@ public class ChartsService {
     static final String CAT_EXPENSE = "EXPENSE";
     static final String CAT_ASSET = "ASSET";
     static final String CAT_OTHER = "OTHER";
-    static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
-    static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
 
     static final String TOTALS = "totals";
 

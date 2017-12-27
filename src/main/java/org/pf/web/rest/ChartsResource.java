@@ -3,12 +3,16 @@ package org.pf.web.rest;
 import com.codahale.metrics.annotation.Timed;
 import org.pf.security.SecurityUtils;
 import org.pf.service.ChartsService;
+import org.pf.service.RestoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * REST controller for managing Charts.
@@ -18,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChartsResource {
 
     private final Logger log = LoggerFactory.getLogger(ChartsResource.class);
+
+    @Autowired
+    private RestoreService restoreService;
 
     private final ChartsService chartsService;
 
@@ -48,7 +55,18 @@ public class ChartsResource {
 
     }
 
+    @GetMapping("/importing")
+    @Timed
+    public List<String> importing(
+        @RequestParam(required = false, value = "login") String login,
+        @RequestParam(required = false, value = "path") String filePath) throws Exception {
 
+        log.info("Importing old database");
+        if(filePath == null) filePath = "/Users/Macpro/Projects/pf-jhipster4/pf-backup-2017-12-27.csv";
+        List<String> out = restoreService.importFile("user", filePath);
+        return out;
+
+    }
 
 
 }

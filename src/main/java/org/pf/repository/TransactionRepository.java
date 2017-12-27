@@ -49,7 +49,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         + "ORDER BY t.date")
     List<Transaction> findByUserLoginAndDateBetween(String login, ZonedDateTime fromDate, ZonedDateTime toDate);
 
-
-
-
+    void deleteByUser_Login(String login);
 }

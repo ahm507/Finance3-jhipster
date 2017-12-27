@@ -18,5 +18,5 @@ public interface CurrencyRepository extends JpaRepository<Currency, Long> {
 
     List<Currency> findByUser_Login(String login);
 
-    List<Currency> findByNameAndUser_Login(String userLogin, String name);
+    List<Currency> findByNameAndUser_Login(String name, String login);
 }
