@@ -207,7 +207,7 @@ public class ChartsResourceIntTest {
         html = chartsService.getTransactionsTrendHtml("", "", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>2017</td><td>300.0</td><td>0.0</td><td>0.0</td><td>-200.0</td></tr>");
+            .contains("<tr><td>-2000.0</td><td>2017</td><td>-200.0</td><td>300.0</td><td>100.0</td><td>-500.0</td></tr>");
 
         html = chartsService.getTransactionsTrendHtml("2017", "EXPENSE", user.getLogin());
         assertThat(html)

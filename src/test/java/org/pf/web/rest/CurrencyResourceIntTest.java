@@ -199,7 +199,9 @@ public class CurrencyResourceIntTest {
         currencyRepository.saveAndFlush(currency);
 
         // Get all the currencyList
-        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc"))
+        restCurrencyMockMvc.perform(get("/api/currencies?sort=id,desc"
+            + "&login=" + currency.getUser().getLogin()
+        ))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))

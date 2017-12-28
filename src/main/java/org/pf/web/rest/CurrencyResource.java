@@ -2,6 +2,7 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
+import org.pf.security.SecurityUtils;
 import org.pf.service.CurrencyService;
 import org.pf.service.dto.CurrencyDTO;
 import org.pf.web.rest.errors.BadRequestAlertException;
@@ -99,7 +100,7 @@ public class CurrencyResource {
     public List<CurrencyDTO> getAllCurrencies(@RequestParam(required = false, value = "login")  String login) {
         log.debug("REST request to get all Currencies");
         if(login == null) { //WEB Currently ONLY.
-            return currencyService.findAllByCurrentUser();
+            login = SecurityUtils.getCurrentUserLogin().get();
         }
         //Unit Test
         return currencyService.findAllByCurrentUser(login);

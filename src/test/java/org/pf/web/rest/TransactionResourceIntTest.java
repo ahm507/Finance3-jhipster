@@ -113,12 +113,12 @@ public class TransactionResourceIntTest {
         em.flush();
         transaction.setUser(user);
         // Add required entity
-        UserAccount withdrawAccount = UserAccountResourceIntTest.createEntity(em);
+        UserAccount withdrawAccount = UserAccountResourceIntTest.createEntity(em, "account1");
         em.persist(withdrawAccount);
         em.flush();
         transaction.setWithdrawAccount(withdrawAccount);
         // Add required entity
-        UserAccount depositAccount = UserAccountResourceIntTest.createEntity(em);
+        UserAccount depositAccount = UserAccountResourceIntTest.createEntity(em, "account2");
         em.persist(depositAccount);
         em.flush();
         transaction.setDepositAccount(depositAccount);

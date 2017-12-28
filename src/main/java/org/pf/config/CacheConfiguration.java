@@ -48,7 +48,7 @@ public class CacheConfiguration {
             cm.createCache(org.pf.domain.Currency.class.getName(), jcacheConfiguration);
             cm.createCache(org.pf.domain.UserAccount.class.getName(), jcacheConfiguration);
             cm.createCache(org.pf.domain.Transaction.class.getName(), jcacheConfiguration);
-            cm.createCache(org.pf.domain.Charts.class.getName(), jcacheConfiguration);
+//            cm.createCache(org.pf.domain.Charts.class.getName(), jcacheConfiguration);
             // jhipster-needle-ehcache-add-entry
         };
     }

@@ -311,8 +311,9 @@ public class TransactionServiceImpl implements TransactionService{
     public boolean isInvalidCurrencies(TransactionDTO transactionDTO) {
         long depositId = transactionDTO.getDepositAccountId();
         long withdrawId = transactionDTO.getWithdrawAccountId();
-        return (userAccountRepository.findOne(depositId).getCurrency().getId() !=
-            userAccountRepository.findOne(withdrawId).getCurrency().getId());
+        UserAccount withdraw = userAccountRepository.findOne(withdrawId);
+        UserAccount deposit = userAccountRepository.findOne(depositId);
+        return (! withdraw.getCurrency().getName().contentEquals(deposit.getCurrency().getName()) );
     }
 
 

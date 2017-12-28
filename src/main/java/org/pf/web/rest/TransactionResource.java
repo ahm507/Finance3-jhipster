@@ -65,10 +65,12 @@ public class TransactionResource {
         }
 
         if(transactionDTO.getAmount() < 0) {
+            log.error("Transaction amount must be zero or more, ", ENTITY_NAME);
             throw new BadRequestAlertException("Amount is not allowed to be less than zero", ENTITY_NAME, "negative.value");
         }
 
         if(transactionService.isInvalidCurrencies(transactionDTO)) {
+            log.error("Transactions must not be between the same user account, ", ENTITY_NAME);
             throw new BadRequestAlertException("Transactions should be between consistent currencies", ENTITY_NAME, "currency.value");
         }
 

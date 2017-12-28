@@ -96,9 +96,9 @@ public class UserAccountResourceIntTest {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static UserAccount createEntity(EntityManager em) {
+    public static UserAccount createEntity(EntityManager em, String accountName) {
         UserAccount userAccount = new UserAccount()
-            .text(DEFAULT_TEXT)
+            .text(accountName)
             .description(DEFAULT_DESCRIPTION)
             .type(DEFAULT_TYPE);
         // Add required entity
@@ -117,7 +117,7 @@ public class UserAccountResourceIntTest {
     @Before
     public void initTest() {
         userAccountSearchRepository.deleteAll();
-        userAccount = createEntity(em);
+        userAccount = createEntity(em, DEFAULT_TEXT);
     }
 
     @Test

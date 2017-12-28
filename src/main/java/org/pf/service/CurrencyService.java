@@ -47,7 +47,7 @@ public interface CurrencyService {
      */
     List<CurrencyDTO> search(String query);
 
-    List<CurrencyDTO> findAllByCurrentUser();
+//    List<CurrencyDTO> findAllByCurrentUser();
 
     List<CurrencyDTO> findAllByCurrentUser(String login);
 
