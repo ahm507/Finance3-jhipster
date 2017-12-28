@@ -141,3 +141,5 @@ Desktop.ini
 # ESLint
 ######################
 .eslintcache
+/pf-backup-2017-12-27.csv
+/.gitignore
