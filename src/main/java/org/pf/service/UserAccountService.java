@@ -4,6 +4,8 @@ import org.pf.service.dto.UserAccountDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service Interface for managing UserAccount.
  */
@@ -52,6 +54,8 @@ public interface UserAccountService {
 
     Page<UserAccountDTO> findByCurrentUser(String login, Pageable pageable);
 
-    public boolean isDuplicateName(String login, String accountText) ;
+    List<UserAccountDTO> findByCurrentUser(String login);
+
+    boolean isDuplicateName(String login, String accountText) ;
 
 }

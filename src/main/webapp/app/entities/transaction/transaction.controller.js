@@ -5,9 +5,9 @@
         .module('financeApp')
         .controller('TransactionController', TransactionController);
 
-    TransactionController.$inject = ['Transaction', 'TransactionSearch', 'ParseLinks', 'AlertService', 'paginationConstants', 'UserAccount'];
+    TransactionController.$inject = ['Transaction', 'TransactionSearch', 'ParseLinks', 'AlertService', 'paginationConstants', 'UserAccount', '$http'];
 
-    function TransactionController(Transaction, TransactionSearch, ParseLinks, AlertService, paginationConstants, UserAccount) {
+    function TransactionController(Transaction, TransactionSearch, ParseLinks, AlertService, paginationConstants, UserAccount, $http) {
 
         var vm = this;
 
@@ -38,14 +38,13 @@
             localStorage.setItem("yearSelected", vm.yearSelected);
             loadAll();
         }
-
         //Load User Accounts and decorate a new "path" property
-        vm.useraccounts = UserAccount.query({}, onSuccess);
-        function onSuccess(data) {
-            data.forEach(function (element) {
-                 element.path = element.text + ' - ' + element.type + '(' + element.currencyName + ')';
+        $http.get('api/user-accountsAsList').then(function (payload, xhr) {
+            vm.useraccounts = payload.data;
+            vm.useraccounts.forEach(function (element) {
+                 element.path = element.type + ': ' + element.text + '(' + element.currencyName + ')';
             });
-        }
+        });
 
         //Load list of years in transactions
         vm.yearList = Transaction.queryYears({});

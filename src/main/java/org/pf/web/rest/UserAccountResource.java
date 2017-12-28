@@ -43,7 +43,6 @@ public class UserAccountResource {
     private static final String ENTITY_NAME = "userAccount";
 
     private final UserAccountService userAccountService;
-
     public UserAccountResource(UserAccountService userAccountService) {
         this.userAccountService = userAccountService;
     }
@@ -105,7 +104,6 @@ public class UserAccountResource {
     @Timed
     public ResponseEntity<List<UserAccountDTO>> getAllUserAccountsByUser(@RequestParam(required = false, name = "login") String login, Pageable pageable) {
         log.debug("REST request to get a page of UserAccounts");
-        //Page<UserAccountDTO> page = userAccountService.findAll(pageable);
         if(login == null) { //NOT IN TEST CASES
             login = SecurityUtils.getCurrentUserLogin().get();
         }
@@ -113,6 +111,22 @@ public class UserAccountResource {
 
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/user-accounts");
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+
+
+    /**
+     * GET  /user-accounts : get all the userAccounts.
+     *
+     * @return the ResponseEntity with status 200 (OK) and the list of userAccounts in body
+     */
+    @GetMapping("/user-accountsAsList")
+    @Timed
+    public List<UserAccountDTO> getAllUserAccountsByUserAsList(@RequestParam(required = false, name = "login") String login) {
+        log.debug("REST request to get a page of UserAccounts - as List");
+        if(login == null) { //NOT IN TEST CASES
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        return userAccountService.findByCurrentUser(login);
     }
 
     /**

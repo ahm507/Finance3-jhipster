@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -160,6 +161,14 @@ public class UserAccountServiceImpl implements UserAccountService{
         }
         return userAccountRepository.findByUser_LoginOrderByTypeAsc(login, pageable)
             .map(userAccountMapper::toDto);
+    }
+
+    @Override public List<UserAccountDTO> findByCurrentUser(String login) {
+        log.debug("Request to get all UserAccounts of current logged in user");
+        if(login == null) { //Web Interface ONLY (TEST cases will fail)
+            login = SecurityUtils.getCurrentUserLogin().get();
+        }
+        return userAccountMapper.toDto(userAccountRepository.findByUser_LoginOrderByTypeAsc(login));
     }
 
 }
