@@ -38,13 +38,8 @@
             localStorage.setItem("yearSelected", vm.yearSelected);
             loadAll();
         }
-        //Load User Accounts and decorate a new "path" property
-        $http.get('api/user-accountsAsList').then(function (payload, xhr) {
-            vm.useraccounts = payload.data;
-            vm.useraccounts.forEach(function (element) {
-                 element.path = element.type + ': ' + element.text + '(' + element.currencyName + ')';
-            });
-        });
+        //Load User Accounts
+        vm.useraccounts = UserAccount.queryAsList();
 
         //Load list of years in transactions
         vm.yearList = Transaction.queryYears({});
