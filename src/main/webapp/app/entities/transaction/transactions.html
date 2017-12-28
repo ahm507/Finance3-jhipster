@@ -90,8 +90,8 @@
                             {{transaction.depositAccountText}}
                         <!-- </a> -->
                     </td>
-                    <td>{{transaction.amount}}</td>
-                    <td>{{transaction.balance}}</td>
+                    <td>{{transaction.amount | currency:""}}</td>
+                    <td>{{transaction.balance | currency:""}}</td>
                     <td class="text-right">
                         <div class="btn-group flex-btn-group-container">
                             <!--<button type="submit"-->
