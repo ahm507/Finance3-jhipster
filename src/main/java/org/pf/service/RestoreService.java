@@ -27,7 +27,6 @@ public class RestoreService {
     private final Logger log = LoggerFactory.getLogger(RestoreService.class);
 
     private UserAccountRepository userAccountRepository;
-    private UserAccountService userAccountService;
     private TransactionService transactionService;
     private UserRepository userRepository;
     private TransactionMapper transactionMapper;
@@ -37,8 +36,7 @@ public class RestoreService {
         UserRepository userRepository, TransactionMapper transactionMapper,
         CurrencyRepository currencyRepository) {
 		this.userAccountRepository = userAccountRepository;
-		this.userAccountService = userAccountService;
-		this.transactionService = transactionService;
+        this.transactionService = transactionService;
         this.userRepository = userRepository;
         this.transactionMapper = transactionMapper;
         this.currencyRepository = currencyRepository;
