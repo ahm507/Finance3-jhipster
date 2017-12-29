@@ -55,8 +55,7 @@ public class RestoreService {
         }
 	}
 
-	@Transactional
-	public List<String> importFile(CSVReader reader, String login) throws Exception {
+	private List<String> importFile(CSVReader reader, String login) throws Exception {
 		String[] nextLine;
 		deleteAccountsAndTransactions(login);
 		List<String> output = new ArrayList<>();
@@ -72,7 +71,7 @@ public class RestoreService {
 			}
 			line++;
 			createTransactionAndAccounts(login, nextLine);
-			String lineText = "Done " + String.valueOf(line) + ":, " + nextLine[0] + ", " + nextLine[1];
+			String lineText = "Done " + line + ":, " + nextLine[0] + ", " + nextLine[1];
 			output.add(lineText + "<br>");
             log.debug(lineText + "\r\n");
 		}
@@ -87,9 +86,6 @@ public class RestoreService {
 		String depositName = segments[3];
 		String amount = segments[4];
 		String currency = segments[5];
-//		String withdrawId = getAccountId(login, withdrawName, currency);
-//		String depositId = getAccountId(login, depositName, currency);
-
 		amount = amount.replace("\"", "");
 		amount = amount.replace(",", "");
 		description = description.replace("\"", "");
@@ -127,7 +123,6 @@ public class RestoreService {
             return accounts.get(0);
         }
         //create one account, cache it and return it
-        //if (accounts.isEmpty()) {
         Currency currency = getCurrency(user, currencyName);
         UserAccount newAccount = new UserAccount()
             .user(user).text(accountName).type(accountType).currency(currency);
@@ -179,8 +174,7 @@ public class RestoreService {
         return accountType;
     }
 
-    @Transactional
-	private void deleteAccountsAndTransactions(String login) throws Exception {
+	private void deleteAccountsAndTransactions(String login) {
       transactionService.deleteAllByUser(login);
 		  userAccountRepository.deleteByUser_Login(login);
 	}
