@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,44 +43,45 @@ public class RestoreService {
         this.currencyRepository = currencyRepository;
     }
 
-	public List<String> importFile(String login, Reader reader) throws Exception {
+	public List<String> importFile(String login, Reader reader) throws RestoreException,
+        IOException {
 		try (CSVReader csvReader = new CSVReader(reader)) {
             return importFile(csvReader, login);
         }
 	}
 
 	@Transactional
-	public List<String> importFile(String login, String fileName) throws Exception {
+	public List<String> importFile(String login, String fileName) throws RestoreException, IOException {
 		try (CSVReader reader  = new CSVReader(new FileReader(fileName))) {
 		    return importFile(reader, login);
         }
 	}
 
-	private List<String> importFile(CSVReader reader, String login) throws Exception {
+	private List<String> importFile(CSVReader reader, String login) throws RestoreException, IOException {
 		String[] nextLine;
 		deleteAccountsAndTransactions(login);
 		List<String> output = new ArrayList<>();
 		// skip first line of field column name
-		reader.readNext();
-		int line = 0;
-		while ((nextLine = reader.readNext()) != null) {
-			if (nextLine[0].isEmpty()) {
-				output.add("Finished, next line is blank" + "<br>");
-				output.add("Import is finished successfully, I hope :)<br>");
-				reader.close();
-				return output;
-			}
-			line++;
-			createTransactionAndAccounts(login, nextLine);
-			String lineText = "Done " + line + ":, " + nextLine[0] + ", " + nextLine[1];
-			output.add(lineText + "<br>");
+        reader.readNext();
+        int line = 0;
+        while ((nextLine = reader.readNext()) != null) {
+            if (nextLine[0].isEmpty()) {
+                output.add("Finished, next line is blank" + "<br>");
+                output.add("Import is finished successfully, I hope :)<br>");
+                reader.close();
+                return output;
+            }
+            line++;
+            createTransactionAndAccounts(login, nextLine);
+            String lineText = "Done " + line + ":, " + nextLine[0] + ", " + nextLine[1];
+            output.add(lineText + "<br>");
             log.debug(lineText + "\r\n");
-		}
+        }
 		output.add("Import is finished successfully, I hope :)<br>");
 		return output;
 	}
 
-	private void createTransactionAndAccounts(String login, String[] segments) throws Exception {
+	private void createTransactionAndAccounts(String login, String[] segments) throws RestoreException {
 		String date = segments[0];
 		String description = segments[1];
 		String withdrawName = segments[2];
@@ -100,7 +102,7 @@ public class RestoreService {
 	// be tested fully.
     HashMap<String, UserAccount> accountCache = new HashMap<>();
 
-	private UserAccount getAccount(User user, String accountNamePath, String currencyName) throws Exception {
+	private UserAccount getAccount(User user, String accountNamePath, String currencyName) throws RestoreException {
 		// get from hash
 		UserAccount account = accountCache.get(accountNamePath);
 		if (account != null) {
@@ -108,15 +110,14 @@ public class RestoreService {
 		}
 		// else get from DB
 		String[] seg = accountNamePath.split(":");
-		if (seg.length != 2) {
-			throw new Exception("Parser Error: " + accountNamePath);
-		}
+		if (seg.length != 2)
+            throw new RestoreException("Parser Error: " + accountNamePath);
 		String accountName = seg[1];
         AccountType accountType = getAccountType(seg[0]);
 		List<UserAccount> accounts = userAccountRepository
             .findByUser_LoginAndTextAndType(user.getLogin(), accountName, accountType);
 		if(accounts.size() > 1) {
-            throw new Exception("Duplicate accunt error, " + accounts);
+            throw new RestoreException("Duplicate accunt error, " + accounts);
         }
         if(accounts.size() == 1) {
             accountCache.put(accountNamePath, accounts.get(0));
@@ -132,10 +133,10 @@ public class RestoreService {
 		return newAccount;
 	}
 
-    private Currency getCurrency(User user, String currencyName) throws Exception {
+    private Currency getCurrency(User user, String currencyName) throws RestoreException {
         List<Currency> currency = currencyRepository.findByNameAndUser_Login(currencyName, user.getLogin());
         if(currency.size() > 1) {
-            throw new Exception(
+            throw new RestoreException(
                 "Duplicate currency error" + currencyName);
         }
         if(currency.isEmpty()) {
@@ -145,11 +146,10 @@ public class RestoreService {
             currencyRepository.save(newCurrency);
             return newCurrency;
         }
-
         return currency.get(0);
     }
 
-    private AccountType getAccountType(String accountTypeString) throws Exception {
+    private AccountType getAccountType(String accountTypeString) throws RestoreException {
         AccountType accountType;
         switch (accountTypeString) {
             case "Assets":
@@ -168,7 +168,7 @@ public class RestoreService {
                 accountType = AccountType.OTHER;
                 break;
             default:
-                throw new Exception(
+                throw new RestoreException(
                     "Parent Account must be one of 'Assets/Expenses/Income/Liability/Other', " + accountTypeString + " is invalid!");
         }
         return accountType;
