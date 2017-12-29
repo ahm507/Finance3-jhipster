@@ -17,9 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileReader;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
 
 @Service
 @Transactional(readOnly = true)
@@ -59,8 +59,7 @@ public class RestoreService {
 	public List<String> importFile(CSVReader reader, String login) throws Exception {
 		String[] nextLine;
 		deleteAccountsAndTransactions(login);
-
-		Vector<String> output = new Vector<>();
+		List<String> output = new ArrayList<>();
 		// skip first line of field column name
 		reader.readNext();
 		int line = 0;
@@ -78,9 +77,7 @@ public class RestoreService {
             log.debug(lineText + "\r\n");
 		}
 		output.add("Import is finished successfully, I hope :)<br>");
-
 		return output;
-
 	}
 
 	private void createTransactionAndAccounts(String login, String[] segments) throws Exception {
