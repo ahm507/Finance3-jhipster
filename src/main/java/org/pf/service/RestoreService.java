@@ -46,18 +46,9 @@ public class RestoreService {
     }
 
 	public List<String> importFile(String login, Reader reader) throws Exception {
-		CSVReader csvReader = null;
-		List<String> output = new ArrayList<>();
-		try {
-			csvReader = new CSVReader(reader);
-			output = importFile(csvReader, login);
-			csvReader.close();
-		} finally {
-			if (csvReader != null) {
-				csvReader.close();
-			}
-		}
-		return output;
+		try (CSVReader csvReader = new CSVReader(reader)) {
+            return importFile(csvReader, login);
+        }
 	}
 
 	@Transactional
