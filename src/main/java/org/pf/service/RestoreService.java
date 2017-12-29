@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,12 +40,12 @@ public class RestoreService {
         this.currencyRepository = currencyRepository;
     }
 
-	public List<String> importFile(String login, Reader reader) throws RestoreException,
-        IOException {
-		try (CSVReader csvReader = new CSVReader(reader)) {
-            return importFile(csvReader, login);
-        }
-	}
+//	public List<String> importFile(String login, Reader reader) throws RestoreException,
+//        IOException {
+//		try (CSVReader csvReader = new CSVReader(reader)) {
+//            return importFile(csvReader, login);
+//        }
+//	}
 
 	@Transactional
 	public List<String> importFile(String login, String fileName) throws RestoreException, IOException {
@@ -98,7 +97,7 @@ public class RestoreService {
 
 	// Two levels only: This limitation has many side effects, changing it must
 	// be tested fully.
-    HashMap<String, UserAccount> accountCache = new HashMap<>();
+    private HashMap<String, UserAccount> accountCache = new HashMap<>();
 
 	private UserAccount getAccount(User user, String accountNamePath, String currencyName) throws RestoreException {
 		// get from hash
