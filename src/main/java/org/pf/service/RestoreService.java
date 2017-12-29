@@ -32,10 +32,8 @@ public class RestoreService {
     private UserRepository userRepository;
     private TransactionMapper transactionMapper;
     private CurrencyRepository currencyRepository;
-	public RestoreService(UserAccountRepository userAccountRepository, UserAccountService userAccountService,
-        TransactionService transactionService,
-        UserRepository userRepository, TransactionMapper transactionMapper,
-        CurrencyRepository currencyRepository) {
+	public RestoreService(UserAccountRepository userAccountRepository, TransactionService transactionService,
+        UserRepository userRepository, TransactionMapper transactionMapper, CurrencyRepository currencyRepository) {
 		this.userAccountRepository = userAccountRepository;
         this.transactionService = transactionService;
         this.userRepository = userRepository;
