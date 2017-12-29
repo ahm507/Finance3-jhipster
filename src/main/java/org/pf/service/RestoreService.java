@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -53,12 +52,9 @@ public class RestoreService {
 
 	@Transactional
 	public List<String> importFile(String login, String fileName) throws Exception {
-		CSVReader reader = null;
-		List<String> output = new ArrayList<>();
-		reader = new CSVReader(new FileReader(fileName));
-		output = importFile(reader, login);
-		reader.close();
-		return output;
+		try (CSVReader reader  = new CSVReader(new FileReader(fileName))) {
+		    return importFile(reader, login);
+        }
 	}
 
 	@Transactional
