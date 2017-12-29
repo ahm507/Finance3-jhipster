@@ -69,14 +69,11 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransactionDTO save(TransactionDTO transactionDTO) {
         log.debug("Request to save Transaction : {}", transactionDTO);
-
         enforceSavingToCurrentUser(transactionDTO);
-
         Transaction transaction = transactionMapper.toEntity(transactionDTO);
         transaction = transactionRepository.save(transaction);
-        TransactionDTO result = transactionMapper.toDto(transaction);
         transactionSearchRepository.save(transaction);
-        return result;
+        return transactionMapper.toDto(transaction);
     }
 
     private void enforceSavingToCurrentUser(TransactionDTO transactionDTO) {
@@ -314,6 +311,12 @@ public class TransactionServiceImpl implements TransactionService{
         UserAccount withdraw = userAccountRepository.findOne(withdrawId);
         UserAccount deposit = userAccountRepository.findOne(depositId);
         return (! withdraw.getCurrency().getName().contentEquals(deposit.getCurrency().getName()) );
+    }
+
+    public void deleteAllByUser(String login) {
+        transactionRepository.deleteByUser_Login(login);
+        transactionSearchRepository.deleteByUser_Login(login);
+
     }
 
 

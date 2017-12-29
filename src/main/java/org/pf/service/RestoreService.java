@@ -7,7 +7,6 @@ import org.pf.domain.User;
 import org.pf.domain.UserAccount;
 import org.pf.domain.enumeration.AccountType;
 import org.pf.repository.CurrencyRepository;
-import org.pf.repository.TransactionRepository;
 import org.pf.repository.UserAccountRepository;
 import org.pf.repository.UserRepository;
 import org.pf.service.mapper.TransactionMapper;
@@ -30,18 +29,16 @@ public class RestoreService {
 
     private UserAccountRepository userAccountRepository;
     private UserAccountService userAccountService;
-    private TransactionRepository transactionRepository;
     private TransactionService transactionService;
     private UserRepository userRepository;
     private TransactionMapper transactionMapper;
     private CurrencyRepository currencyRepository;
 	public RestoreService(UserAccountRepository userAccountRepository, UserAccountService userAccountService,
-        TransactionRepository transactionRepository, TransactionService transactionService,
+        TransactionService transactionService,
         UserRepository userRepository, TransactionMapper transactionMapper,
         CurrencyRepository currencyRepository) {
 		this.userAccountRepository = userAccountRepository;
 		this.userAccountService = userAccountService;
-		this.transactionRepository = transactionRepository;
 		this.transactionService = transactionService;
         this.userRepository = userRepository;
         this.transactionMapper = transactionMapper;
@@ -118,8 +115,7 @@ public class RestoreService {
 		Transaction t = new Transaction().user(user).amount(Double.valueOf(amount)).date(DateHelper.getZonedDateTime(date))
             .description(description).depositAccount(getAccount(user, depositName, currency))
             .withdrawAccount(getAccount(user, withdrawName, currency));
-//        transactionService.save(transactionMapper.toDto(t));
-        transactionRepository.save(t);
+        transactionService.save(transactionMapper.toDto(t));
 	}
 
 	// Two levels only: This limitation has many side effects, changing it must
@@ -154,9 +150,8 @@ public class RestoreService {
         UserAccount newAccount = new UserAccount()
             .user(user).text(accountName).type(accountType).currency(currency);
         userAccountRepository.save(newAccount);
-//			acc2 = userAccountRepository.findByUser_IdAndId(userId, acc2UUID);
         accountCache.put(accountNamePath, newAccount);
-//		}
+
 		return newAccount;
 	}
 
@@ -204,7 +199,7 @@ public class RestoreService {
 
     @Transactional
 	private void deleteAccountsAndTransactions(String login) throws Exception {
-		transactionRepository.deleteByUser_Login(login);
-		userAccountRepository.deleteByUser_Login(login);
+      transactionService.deleteAllByUser(login);
+		  userAccountRepository.deleteByUser_Login(login);
 	}
 }

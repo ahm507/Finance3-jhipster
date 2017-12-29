@@ -61,4 +61,5 @@ public interface TransactionService {
     double computeBalance(long accountId, AccountType type, double initialBalance,
         List<TransactionDTO> listOfTrans);
 
+    void deleteAllByUser(String login);
 }
