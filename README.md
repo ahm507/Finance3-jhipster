@@ -145,3 +145,29 @@ to clear checkSums
 
 http://www.liquibase.org/documentation/maven/
 
+
+## KarmaJS
+* UI unit tests are located in the src/test/javascript/spec folder. They are written in Jasmine and run with Karma.js.
+
+* Those tests will mock up the access to the application’s REST endpoints, so you can test your UI layer without having to launch the Java back-end.
+
+* Those tests can be run using yarn test (For AngularJS 1.x: gulp test).
+
+* To debug your JS tests, you will need to disable minification and Istanbul covarage on your Javascript files. To do so start Karma with the –debug option, something like this: 
+
+        ./node_modules/karma/bin/karma start src/test/javascript/karma.conf.js --debug
+    
+    , then navigate to Karma debug page, http://localhost:9876/debug.html, 
+    and open your Javascript console.
+
+
+Tip: if you want to focus on a single test change the module description 
+
+        from describe('...', function() { to fdescribe('...', function() { 
+
+and Jasmine will run this test only.
+
+* See Jasmin tutorial at:
+
+https://jasmine.github.io/2.0/introduction.html 
+

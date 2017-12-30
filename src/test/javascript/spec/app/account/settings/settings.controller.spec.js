@@ -8,7 +8,7 @@ describe('Controller Tests', function() {
     describe('SettingsController', function() {
 
         var $scope, $q; // actual implementations
-        var MockPrincipal, MockAuth; // mocks
+        var MockPrincipal, MockAuth, MockCurrency; // mocks
         var createController; // local utility functions
 
         beforeEach(inject(function($injector) {
@@ -16,10 +16,12 @@ describe('Controller Tests', function() {
             $scope = $injector.get("$rootScope").$new();
             MockAuth = jasmine.createSpyObj('MockAuth', ['updateAccount']);
             MockPrincipal = jasmine.createSpyObj('MockPrincipal', ['identity']);
+            MockCurrency = jasmine.createSpyObj('MockCurrency', ['query'])
             var locals = {
                 '$scope': $scope,
                 'Principal': MockPrincipal,
-                'Auth': MockAuth
+                'Auth': MockAuth,
+                'Currency': MockCurrency
             };
             createController = function() {
                 $injector.get('$controller')('SettingsController as vm', locals);
@@ -35,10 +37,18 @@ describe('Controller Tests', function() {
                 activated: true,
                 email: "john.doe@mail.com",
                 langKey: "en",
-                login: "john"
+                login: "john",
+                masterCurrency: 1
             };
+
+            var currencyListValues = [
+                {id: 1, name: 'USD', conversionRate: 18.0},
+                {id: 2, name: 'EGP', conversionRate: 1.0},
+            ];
+
             MockPrincipal.identity.and.returnValue($q.resolve(accountValues));
             MockAuth.updateAccount.and.returnValue($q.resolve());
+            MockCurrency.query.and.returnValue($q.resolve(currencyListValues));
             $scope.$apply(createController);
 
             //WHEN
