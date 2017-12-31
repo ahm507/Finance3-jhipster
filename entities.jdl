@@ -1,16 +1,12 @@
 
 
-entity UserSettings {
-	usdRate Double required,
-    sarRate Double required
-}
-
 enum AccountType {
     ASSET, EXPENSE, INCOME, LIABILITY, OTHER
 }
 
 entity Currency {
-    name String required maxlength(3) minlength(3)
+    name String required maxlength(3) minlength(3),
+    conversionRate Double required min(1)
 }
 
 entity UserAccount {
@@ -23,10 +19,6 @@ entity Transaction {
     date ZonedDateTime required,
     amount Double required,
     description String maxlength(100)
-}
-
-relationship OneToOne {
-	UserSettings{user(login) required} to User
 }
 
 
