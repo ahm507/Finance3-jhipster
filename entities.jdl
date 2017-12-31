@@ -1,5 +1,4 @@
 
-
 enum AccountType {
     ASSET, EXPENSE, INCOME, LIABILITY, OTHER
 }
@@ -21,6 +20,10 @@ entity Transaction {
     description String maxlength(100)
 }
 
+
+entity Charts {
+
+}
 
 relationship ManyToOne {
 	UserAccount{user(login) required} to User,
