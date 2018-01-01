@@ -171,3 +171,27 @@ and Jasmine will run this test only.
 
 https://jasmine.github.io/2.0/introduction.html 
 
+
+## Protractor E2E Tests
+
+Once, you need to update webdriver-manager
+ 
+    npm install -g protractor
+    sudo webdriver-manager update
+
+Before running tests, you have to start webdriver
+
+    webdriver-manager start
+
+
+In another tab, run 
+    
+    protractor ./src/test/javascript/e2e/protractor.conf.js
+    
+The file, protractor.conf.js includes seleniumAddress and an array of all test case files
+          
+Note: 
+1. Generating Protractor using JHipster does not work with me.
+2. No tests now, but I will add very soon.
+
+See, http://www.protractortest.org/#/ for details. 
