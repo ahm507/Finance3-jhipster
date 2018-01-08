@@ -202,28 +202,28 @@ public class ChartsResourceIntTest {
         String html = chartsService.getTransactionsTrendHtml("2017", "ASSET", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>Feb</td><td>-500.0</td><td>-500.0</td></tr>");
+            .contains("<tr><td>Feb</td><td>-500.00</td><td>-500.00</td></tr>");
 
         html = chartsService.getTransactionsTrendHtml("", "", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>-2000.0</td><td>2017</td><td>-200.0</td><td>300.0</td><td>100.0</td><td>-500.0</td></tr>");
+            .contains("<tr><td>-2,000.00</td><td>2017</td><td>-200.00</td><td>300.00</td><td>100.00</td><td>-500.00</td></tr>");
 
         html = chartsService.getTransactionsTrendHtml("2017", "EXPENSE", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>Jan</td><td>300.0</td><td>300.0</td></tr>");
+            .contains("<tr><td>Jan</td><td>300.00</td><td>300.00</td></tr>");
 
 
         html = chartsService.getTransactionsTrendHtml("2017", "LIABILITY", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>Feb</td><td>100.0</td><td>100.0</td></tr>");
+            .contains("<tr><td>Feb</td><td>100.00</td><td>100.00</td></tr>");
 
         html = chartsService.getTransactionsTrendHtml("2017", "INCOME", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>Jan</td><td>-200.0</td><td>-200.0</td></tr>");
+            .contains("<tr><td>Jan</td><td>-200.00</td><td>-200.00</td></tr>");
 
 
 
