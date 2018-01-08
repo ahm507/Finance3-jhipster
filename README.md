@@ -195,3 +195,45 @@ Note:
 2. No tests now, but I will add very soon.
 
 See, http://www.protractortest.org/#/ for details. 
+
+
+## Hosting on Google Cloud
+
+1. Create account on Google Cloud and create a project
+2. Create instance
+3. Install gcloud command
+
+    http://blog.sandeepdinesh.com/2015/05/how-to-install-google-cloud-sdk-and.html 
+
+4. Set project id
+
+gcloud config set project VALUE
+
+5. Copy files:
+    
+    gcloud compute scp file/file1.txt instance-1:~/
+
+
+Instance name: instance-1
+Zone name:     us-east1-b
+
+
+Connecting :
+    
+    gcloud compute ssh instance-1 --zone us-east1-b
+
+
+ 
+Copying from local to server:
+
+
+    gcloud compute scp ./bower.json instance-1:~/ --zone us-east1-b
+
+Build finance-war image on  the server
+    
+    docker build .
+
+Build image and tag it
+    
+    sudo docker image build -t finance:latest .
+    

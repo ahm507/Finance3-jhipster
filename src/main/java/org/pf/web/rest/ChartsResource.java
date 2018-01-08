@@ -48,23 +48,25 @@ public class ChartsResource {
         log.debug("REST request to get all Charts");
 
         if(login == null) {
-//             && SecurityUtils.getCurrentUserLogin().isPresent()
-            login = SecurityUtils.getCurrentUserLogin().get();
+            java.util.Optional<String> user = SecurityUtils.getCurrentUserLogin();
+            if(user.isPresent())
+                login = user.get();
+            else
+                return "Unauthorized access";
         }
-
         return chartsService.getTransactionsTrendHtml(year, type, login);
-
     }
 
     //http://localhost:8080/api/importing/path=/Users/Macpro/Projects/pf-jhipster4/pf-backup-2018-01-08.csv
     @GetMapping("/importing")
     @Timed
     public List<String> importing(
-        @RequestParam(required = false, value = "login") String login,
-        @RequestParam(required = true, value = "path") String filePath) throws org.pf.service.RestoreException, java.io.IOException {
+        @RequestParam(required = false) String login,
+        @RequestParam String path) //by default all parameters are required
+        throws org.pf.service.RestoreException, java.io.IOException {
 
         log.info("Importing old database");
-        return restoreService.importFile("user", filePath);
+        return restoreService.importFile("user", path);
     }
 
 
