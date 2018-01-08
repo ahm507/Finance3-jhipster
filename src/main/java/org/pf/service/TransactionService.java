@@ -2,8 +2,6 @@ package org.pf.service;
 
 import org.pf.domain.enumeration.AccountType;
 import org.pf.service.dto.TransactionDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -43,14 +41,6 @@ public interface TransactionService {
      * @param id the id of the entity
      */
     void delete(Long id);
-
-    /**
-     * Search for the transaction corresponding to the query.
-     *
-     * @param query the query of the search
-     * @return the list of entities
-     */
-    Page<TransactionDTO> search(String query, Pageable pageable);
 
     public List<String> getYearList(String login);
 

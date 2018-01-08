@@ -42,16 +42,6 @@ public interface UserAccountService {
      */
     void delete(Long id);
 
-    /**
-     * Search for the userAccount corresponding to the query.
-     *
-     * @param query the query of the search
-     *
-     * @param pageable the pagination information
-     * @return the list of entities
-     */
-    Page<UserAccountDTO> search(String query, Pageable pageable);
-
     Page<UserAccountDTO> findByCurrentUser(String login, Pageable pageable);
 
     List<UserAccountDTO> findByCurrentUser(String login);

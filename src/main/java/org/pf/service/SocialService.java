@@ -1,14 +1,12 @@
 package org.pf.service;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.pf.domain.Authority;
 import org.pf.domain.User;
 import org.pf.repository.AuthorityRepository;
 import org.pf.repository.UserRepository;
 import org.pf.security.AuthoritiesConstants;
-import org.pf.repository.search.UserSearchRepository;
-
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,18 +36,15 @@ public class SocialService {
 
     private final MailService mailService;
 
-    private final UserSearchRepository userSearchRepository;
-
     public SocialService(UsersConnectionRepository usersConnectionRepository, AuthorityRepository authorityRepository,
             PasswordEncoder passwordEncoder, UserRepository userRepository,
-            MailService mailService, UserSearchRepository userSearchRepository) {
+            MailService mailService) {
 
         this.usersConnectionRepository = usersConnectionRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
         this.mailService = mailService;
-        this.userSearchRepository = userSearchRepository;
     }
 
     public void deleteUserSocialConnection(String login) {
@@ -111,8 +106,6 @@ public class SocialService {
         newUser.setAuthorities(authorities);
         newUser.setLangKey(langKey);
         newUser.setImageUrl(imageUrl);
-
-        userSearchRepository.save(newUser);
         return userRepository.save(newUser);
     }
 

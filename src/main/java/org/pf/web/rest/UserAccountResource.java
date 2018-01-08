@@ -157,21 +157,4 @@ public class UserAccountResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-    /**
-     * SEARCH  /_search/user-accounts?query=:query : search for the userAccount corresponding
-     * to the query.
-     *
-     * @param query the query of the userAccount search
-     * @param pageable the pagination information
-     * @return the result of the search
-     */
-    @GetMapping("/_search/user-accounts")
-    @Timed
-    public ResponseEntity<List<UserAccountDTO>> searchUserAccounts(@RequestParam String query, Pageable pageable) {
-        log.debug("REST request to search for a page of UserAccounts for query {}", query);
-        Page<UserAccountDTO> page = userAccountService.search(query, pageable);
-        HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/user-accounts");
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-    }
-
 }

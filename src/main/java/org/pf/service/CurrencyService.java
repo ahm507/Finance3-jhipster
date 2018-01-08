@@ -38,15 +38,6 @@ public interface CurrencyService {
      */
     void delete(Long id);
 
-    /**
-     * Search for the currency corresponding to the query.
-     *
-     * @param query the query of the search
-     *
-     * @return the list of entities
-     */
-    List<CurrencyDTO> search(String query);
-
 //    List<CurrencyDTO> findAllByCurrentUser();
 
     List<CurrencyDTO> findAllByCurrentUser(String login);

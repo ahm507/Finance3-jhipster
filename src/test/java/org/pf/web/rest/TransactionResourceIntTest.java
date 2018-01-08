@@ -9,7 +9,6 @@ import org.pf.domain.Transaction;
 import org.pf.domain.User;
 import org.pf.domain.UserAccount;
 import org.pf.repository.TransactionRepository;
-import org.pf.repository.search.TransactionSearchRepository;
 import org.pf.service.TransactionService;
 import org.pf.service.dto.TransactionDTO;
 import org.pf.service.mapper.TransactionMapper;
@@ -65,9 +64,6 @@ public class TransactionResourceIntTest {
 
     @Autowired
     private TransactionService transactionService;
-
-    @Autowired
-    private TransactionSearchRepository transactionSearchRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -127,7 +123,6 @@ public class TransactionResourceIntTest {
 
     @Before
     public void initTest() {
-        transactionSearchRepository.deleteAll();
         transaction = createEntity(em);
     }
 
@@ -150,10 +145,6 @@ public class TransactionResourceIntTest {
         assertThat(testTransaction.getDate()).isEqualTo(DEFAULT_DATE);
         assertThat(testTransaction.getAmount()).isEqualTo(DEFAULT_AMOUNT);
         assertThat(testTransaction.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
-
-        // Validate the Transaction in Elasticsearch
-        Transaction transactionEs = transactionSearchRepository.findOne(testTransaction.getId());
-        assertThat(transactionEs).isEqualToComparingFieldByField(testTransaction);
     }
 
     @Test
@@ -262,7 +253,6 @@ public class TransactionResourceIntTest {
     public void updateTransaction() throws Exception {
         // Initialize the database
         transactionRepository.saveAndFlush(transaction);
-        transactionSearchRepository.save(transaction);
         int databaseSizeBeforeUpdate = transactionRepository.findAll().size();
 
         // Update the transaction
@@ -287,10 +277,6 @@ public class TransactionResourceIntTest {
         assertThat(testTransaction.getDate()).isEqualTo(UPDATED_DATE);
         assertThat(testTransaction.getAmount()).isEqualTo(UPDATED_AMOUNT);
         assertThat(testTransaction.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
-
-        // Validate the Transaction in Elasticsearch
-        Transaction transactionEs = transactionSearchRepository.findOne(testTransaction.getId());
-        assertThat(transactionEs).isEqualToComparingFieldByField(testTransaction);
     }
 
     @Test
@@ -317,7 +303,6 @@ public class TransactionResourceIntTest {
     public void deleteTransaction() throws Exception {
         // Initialize the database
         transactionRepository.saveAndFlush(transaction);
-        transactionSearchRepository.save(transaction);
         int databaseSizeBeforeDelete = transactionRepository.findAll().size();
 
         // Get the transaction
@@ -325,30 +310,9 @@ public class TransactionResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate Elasticsearch is empty
-        boolean transactionExistsInEs = transactionSearchRepository.exists(transaction.getId());
-        assertThat(transactionExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Transaction> transactionList = transactionRepository.findAll();
         assertThat(transactionList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchTransaction() throws Exception {
-        // Initialize the database
-        transactionRepository.saveAndFlush(transaction);
-        transactionSearchRepository.save(transaction);
-
-        // Search the transaction
-        restTransactionMockMvc.perform(get("/api/_search/transactions?query=id:" + transaction.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(transaction.getId().intValue())))
-            .andExpect(jsonPath("$.[*].date").value(hasItem(sameInstant(DEFAULT_DATE))))
-            .andExpect(jsonPath("$.[*].amount").value(hasItem(DEFAULT_AMOUNT.doubleValue())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())));
     }
 
     @Test

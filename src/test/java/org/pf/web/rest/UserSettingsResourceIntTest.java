@@ -5,7 +5,6 @@ import org.pf.FinanceApp;
 import org.pf.domain.UserSettings;
 import org.pf.repository.UserSettingsRepository;
 import org.pf.service.UserSettingsService;
-import org.pf.repository.search.UserSettingsSearchRepository;
 import org.pf.service.dto.UserSettingsDTO;
 import org.pf.service.mapper.UserSettingsMapper;
 import org.pf.web.rest.errors.ExceptionTranslator;
@@ -52,9 +51,6 @@ public class UserSettingsResourceIntTest {
     private UserSettingsService userSettingsService;
 
     @Autowired
-    private UserSettingsSearchRepository userSettingsSearchRepository;
-
-    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -94,7 +90,6 @@ public class UserSettingsResourceIntTest {
 
     @Before
     public void initTest() {
-        userSettingsSearchRepository.deleteAll();
         userSettings = createEntity(em);
     }
 
@@ -114,10 +109,6 @@ public class UserSettingsResourceIntTest {
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
         assertThat(userSettingsList).hasSize(databaseSizeBeforeCreate + 1);
         UserSettings testUserSettings = userSettingsList.get(userSettingsList.size() - 1);
-
-        // Validate the UserSettings in Elasticsearch
-        UserSettings userSettingsEs = userSettingsSearchRepository.findOne(testUserSettings.getId());
-        assertThat(userSettingsEs).isEqualToComparingFieldByField(testUserSettings);
     }
 
     @Test
@@ -179,7 +170,6 @@ public class UserSettingsResourceIntTest {
     public void updateUserSettings() throws Exception {
         // Initialize the database
         userSettingsRepository.saveAndFlush(userSettings);
-        userSettingsSearchRepository.save(userSettings);
         int databaseSizeBeforeUpdate = userSettingsRepository.findAll().size();
 
         // Update the userSettings
@@ -197,10 +187,6 @@ public class UserSettingsResourceIntTest {
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
         assertThat(userSettingsList).hasSize(databaseSizeBeforeUpdate);
         UserSettings testUserSettings = userSettingsList.get(userSettingsList.size() - 1);
-
-        // Validate the UserSettings in Elasticsearch
-        UserSettings userSettingsEs = userSettingsSearchRepository.findOne(testUserSettings.getId());
-        assertThat(userSettingsEs).isEqualToComparingFieldByField(testUserSettings);
     }
 
     @Test
@@ -227,7 +213,6 @@ public class UserSettingsResourceIntTest {
     public void deleteUserSettings() throws Exception {
         // Initialize the database
         userSettingsRepository.saveAndFlush(userSettings);
-        userSettingsSearchRepository.save(userSettings);
         int databaseSizeBeforeDelete = userSettingsRepository.findAll().size();
 
         // Get the userSettings
@@ -235,27 +220,9 @@ public class UserSettingsResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate Elasticsearch is empty
-        boolean userSettingsExistsInEs = userSettingsSearchRepository.exists(userSettings.getId());
-        assertThat(userSettingsExistsInEs).isFalse();
-
         // Validate the database is empty
         List<UserSettings> userSettingsList = userSettingsRepository.findAll();
         assertThat(userSettingsList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchUserSettings() throws Exception {
-        // Initialize the database
-        userSettingsRepository.saveAndFlush(userSettings);
-        userSettingsSearchRepository.save(userSettings);
-
-        // Search the userSettings
-        restUserSettingsMockMvc.perform(get("/api/_search/user-settings?query=id:" + userSettings.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(userSettings.getId().intValue())));
     }
 
     @Test

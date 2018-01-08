@@ -1,23 +1,24 @@
 package org.pf.service;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.pf.FinanceApp;
 import org.pf.domain.Authority;
 import org.pf.domain.User;
 import org.pf.repository.AuthorityRepository;
 import org.pf.repository.UserRepository;
 import org.pf.security.AuthoritiesConstants;
-import org.pf.repository.search.UserSearchRepository;
-import org.pf.service.MailService;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.social.connect.*;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionKey;
+import org.springframework.social.connect.ConnectionRepository;
+import org.springframework.social.connect.UserProfile;
+import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -25,7 +26,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
@@ -41,9 +42,6 @@ public class SocialServiceIntTest {
 
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private UserSearchRepository userSearchRepository;
-
 
     @Mock
     private MailService mockMailService;
@@ -64,7 +62,7 @@ public class SocialServiceIntTest {
         when(mockUsersConnectionRepository.createConnectionRepository(anyString())).thenReturn(mockConnectionRepository);
 
         socialService = new SocialService(mockUsersConnectionRepository, authorityRepository,
-                passwordEncoder, userRepository, mockMailService, userSearchRepository);
+                passwordEncoder, userRepository, mockMailService);
     }
 
     @Test

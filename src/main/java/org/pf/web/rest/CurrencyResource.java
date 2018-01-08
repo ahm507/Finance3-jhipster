@@ -134,18 +134,4 @@ public class CurrencyResource {
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
     }
 
-    /**
-     * SEARCH  /_search/currencies?query=:query : search for the currency corresponding
-     * to the query.
-     *
-     * @param query the query of the currency search
-     * @return the result of the search
-     */
-    @GetMapping("/_search/currencies")
-    @Timed
-    public List<CurrencyDTO> searchCurrencies(@RequestParam String query) {
-        log.debug("REST request to search Currencies for query {}", query);
-        return currencyService.search(query);
-    }
-
 }

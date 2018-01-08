@@ -8,7 +8,6 @@ import org.pf.FinanceApp;
 import org.pf.domain.Currency;
 import org.pf.domain.User;
 import org.pf.repository.CurrencyRepository;
-import org.pf.repository.search.CurrencySearchRepository;
 import org.pf.service.CurrencyService;
 import org.pf.service.dto.CurrencyDTO;
 import org.pf.service.mapper.CurrencyMapper;
@@ -57,9 +56,6 @@ public class CurrencyResourceIntTest {
     private CurrencyService currencyService;
 
     @Autowired
-    private CurrencySearchRepository currencySearchRepository;
-
-    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -106,7 +102,6 @@ public class CurrencyResourceIntTest {
 
     @Before
     public void initTest() {
-        currencySearchRepository.deleteAll();
         currency = createEntity(em);
     }
 
@@ -128,10 +123,6 @@ public class CurrencyResourceIntTest {
         Currency testCurrency = currencyList.get(currencyList.size() - 1);
         assertThat(testCurrency.getName()).isEqualTo(DEFAULT_NAME);
         assertThat(testCurrency.getConversionRate()).isEqualTo(DEFAULT_CONVERSION_RATE);
-
-        // Validate the Currency in Elasticsearch
-        Currency currencyEs = currencySearchRepository.findOne(testCurrency.getId());
-        assertThat(currencyEs).isEqualToComparingFieldByField(testCurrency);
     }
 
     @Test
@@ -252,7 +243,6 @@ public class CurrencyResourceIntTest {
     public void updateCurrency() throws Exception {
         // Initialize the database
         currencyRepository.saveAndFlush(currency);
-        currencySearchRepository.save(currency);
         int databaseSizeBeforeUpdate = currencyRepository.findAll().size();
 
         // Update the currency
@@ -275,10 +265,6 @@ public class CurrencyResourceIntTest {
         Currency testCurrency = currencyList.get(currencyList.size() - 1);
         assertThat(testCurrency.getName()).isEqualTo(UPDATED_NAME);
         assertThat(testCurrency.getConversionRate()).isEqualTo(UPDATED_CONVERSION_RATE);
-
-        // Validate the Currency in Elasticsearch
-        Currency currencyEs = currencySearchRepository.findOne(testCurrency.getId());
-        assertThat(currencyEs).isEqualToComparingFieldByField(testCurrency);
     }
 
     @Test
@@ -305,7 +291,6 @@ public class CurrencyResourceIntTest {
     public void deleteCurrency() throws Exception {
         // Initialize the database
         currencyRepository.saveAndFlush(currency);
-        currencySearchRepository.save(currency);
         int databaseSizeBeforeDelete = currencyRepository.findAll().size();
 
         // Get the currency
@@ -313,29 +298,11 @@ public class CurrencyResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate Elasticsearch is empty
-        boolean currencyExistsInEs = currencySearchRepository.exists(currency.getId());
-        assertThat(currencyExistsInEs).isFalse();
-
         // Validate the database is empty
         List<Currency> currencyList = currencyRepository.findAll();
         assertThat(currencyList).hasSize(databaseSizeBeforeDelete - 1);
     }
 
-    @Test
-    @Transactional
-    public void searchCurrency() throws Exception {
-        // Initialize the database
-        currencyRepository.saveAndFlush(currency);
-        currencySearchRepository.save(currency);
-
-        // Search the currency
-        restCurrencyMockMvc.perform(get("/api/_search/currencies?query=id:" + currency.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(currency.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME.toString())));
-    }
 
     @Test
     @Transactional

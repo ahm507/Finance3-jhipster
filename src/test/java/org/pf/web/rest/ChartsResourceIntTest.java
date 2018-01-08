@@ -11,7 +11,6 @@ import org.pf.domain.Transaction;
 import org.pf.domain.User;
 import org.pf.domain.UserAccount;
 import org.pf.domain.enumeration.AccountType;
-import org.pf.repository.search.TransactionSearchRepository;
 import org.pf.service.ChartsService;
 import org.pf.web.rest.errors.ExceptionTranslator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,9 +38,6 @@ import static org.pf.web.rest.TestUtil.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = FinanceApp.class)
 public class ChartsResourceIntTest {
-
-    @Autowired
-    private TransactionSearchRepository transactionSearchRepository;
 
     @Autowired
     private ChartsService chartsService;
@@ -87,7 +83,6 @@ public class ChartsResourceIntTest {
 
     @Before
     public void initTest() {
-        transactionSearchRepository.deleteAll();
         user = createUser();
         em.persist(user);
         em.flush();

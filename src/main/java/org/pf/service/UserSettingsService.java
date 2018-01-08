@@ -38,12 +38,4 @@ public interface UserSettingsService {
      */
     void delete(Long id);
 
-    /**
-     * Search for the userSettings corresponding to the query.
-     *
-     * @param query the query of the search
-     * 
-     * @return the list of entities
-     */
-    List<UserSettingsDTO> search(String query);
 }

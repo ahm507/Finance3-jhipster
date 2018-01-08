@@ -2,19 +2,14 @@ package org.pf.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import io.github.jhipster.web.util.ResponseUtil;
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.pf.security.SecurityUtils;
 import org.pf.service.TransactionService;
 import org.pf.service.dto.TransactionDTO;
 import org.pf.web.rest.errors.BadRequestAlertException;
 import org.pf.web.rest.util.HeaderUtil;
-import org.pf.web.rest.util.PaginationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -136,11 +131,11 @@ public class TransactionResource {
         }
         List<TransactionDTO> page;
         if(userAccountId == null && year == null) {
-            throw new NotImplementedException(); //Not needed actually
+            throw new NotImplementedException("Not implemented"); //Not needed actually
         } else if (year == null){
             page = transactionService.findByUserLoginAndAccountId(login, userAccountId);
         } else if (userAccountId == null ) {
-            throw new NotImplementedException(); //Not needed actually
+            throw new NotImplementedException("Not implemented"); //Not needed actually
         } else {
             //both are not null
             page = transactionService.findYearTransactions(login, userAccountId, year);
@@ -178,23 +173,6 @@ public class TransactionResource {
         log.debug("REST request to delete Transaction : {}", id);
         transactionService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
-    }
-
-    /**
-     * SEARCH  /_search/transactions?query=:query : search for the transaction corresponding
-     * to the query.
-     *
-     * @param query the query of the transaction search
-     * @param pageable the pagination information
-     * @return the result of the search
-     */
-    @GetMapping("/_search/transactions")
-    @Timed
-    public ResponseEntity<List<TransactionDTO>> searchTransactions(@RequestParam String query, Pageable pageable) {
-        log.debug("REST request to search for a page of Transactions for query {}", query);
-        Page<TransactionDTO> page = transactionService.search(query, pageable);
-        HttpHeaders headers = PaginationUtil.generateSearchPaginationHttpHeaders(query, page, "/api/_search/transactions");
-        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }
 
     @GetMapping("/transactions/yearList")

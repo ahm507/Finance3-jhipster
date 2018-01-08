@@ -1,10 +1,14 @@
 package org.pf.web.rest;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
 import org.pf.FinanceApp;
 import org.pf.domain.Authority;
 import org.pf.domain.User;
 import org.pf.repository.UserRepository;
-import org.pf.repository.search.UserSearchRepository;
 import org.pf.security.AuthoritiesConstants;
 import org.pf.service.MailService;
 import org.pf.service.UserService;
@@ -12,11 +16,6 @@ import org.pf.service.dto.UserDTO;
 import org.pf.service.mapper.UserMapper;
 import org.pf.web.rest.errors.ExceptionTranslator;
 import org.pf.web.rest.vm.ManagedUserVM;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -29,14 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.Instant;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.assertj.core.api.Assertions.*;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -76,9 +74,6 @@ public class UserResourceIntTest {
     private UserRepository userRepository;
 
     @Autowired
-    private UserSearchRepository userSearchRepository;
-
-    @Autowired
     private MailService mailService;
 
     @Autowired
@@ -106,7 +101,7 @@ public class UserResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        UserResource userResource = new UserResource(userRepository, userService, mailService, userSearchRepository);
+        UserResource userResource = new UserResource(userRepository, userService, mailService);
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
@@ -207,7 +202,6 @@ public class UserResourceIntTest {
     public void createUserWithExistingLogin() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         ManagedUserVM managedUserVM = new ManagedUserVM();
@@ -237,7 +231,6 @@ public class UserResourceIntTest {
     public void createUserWithExistingEmail() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         ManagedUserVM managedUserVM = new ManagedUserVM();
@@ -267,7 +260,6 @@ public class UserResourceIntTest {
     public void getAllUsers() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
 
         // Get all the users
         restUserMockMvc.perform(get("/api/users?sort=id,desc")
@@ -287,7 +279,6 @@ public class UserResourceIntTest {
     public void getUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
 
         // Get the user
         restUserMockMvc.perform(get("/api/users/{login}", user.getLogin()))
@@ -313,7 +304,6 @@ public class UserResourceIntTest {
     public void updateUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
         int databaseSizeBeforeUpdate = userRepository.findAll().size();
 
         // Update the user
@@ -356,7 +346,6 @@ public class UserResourceIntTest {
     public void updateUserLogin() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
         int databaseSizeBeforeUpdate = userRepository.findAll().size();
 
         // Update the user
@@ -400,7 +389,6 @@ public class UserResourceIntTest {
     public void updateUserExistingEmail() throws Exception {
         // Initialize the database with 2 users
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
 
         User anotherUser = new User();
         anotherUser.setLogin("jhipster");
@@ -412,7 +400,6 @@ public class UserResourceIntTest {
         anotherUser.setImageUrl("");
         anotherUser.setLangKey("en");
         userRepository.saveAndFlush(anotherUser);
-        userSearchRepository.save(anotherUser);
 
         // Update the user
         User updatedUser = userRepository.findOne(user.getId());
@@ -444,7 +431,6 @@ public class UserResourceIntTest {
     public void updateUserExistingLogin() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
 
         User anotherUser = new User();
         anotherUser.setLogin("jhipster");
@@ -456,7 +442,6 @@ public class UserResourceIntTest {
         anotherUser.setImageUrl("");
         anotherUser.setLangKey("en");
         userRepository.saveAndFlush(anotherUser);
-        userSearchRepository.save(anotherUser);
 
         // Update the user
         User updatedUser = userRepository.findOne(user.getId());
@@ -488,7 +473,6 @@ public class UserResourceIntTest {
     public void deleteUser() throws Exception {
         // Initialize the database
         userRepository.saveAndFlush(user);
-        userSearchRepository.save(user);
         int databaseSizeBeforeDelete = userRepository.findAll().size();
 
         // Delete the user

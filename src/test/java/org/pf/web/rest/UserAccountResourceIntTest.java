@@ -10,7 +10,6 @@ import org.pf.domain.User;
 import org.pf.domain.UserAccount;
 import org.pf.domain.enumeration.AccountType;
 import org.pf.repository.UserAccountRepository;
-import org.pf.repository.search.UserAccountSearchRepository;
 import org.pf.service.UserAccountService;
 import org.pf.service.dto.UserAccountDTO;
 import org.pf.service.mapper.UserAccountMapper;
@@ -59,9 +58,6 @@ public class UserAccountResourceIntTest {
 
     @Autowired
     private UserAccountService userAccountService;
-
-    @Autowired
-    private UserAccountSearchRepository userAccountSearchRepository;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -116,7 +112,6 @@ public class UserAccountResourceIntTest {
 
     @Before
     public void initTest() {
-        userAccountSearchRepository.deleteAll();
         userAccount = createEntity(em, DEFAULT_TEXT);
     }
 
@@ -139,10 +134,6 @@ public class UserAccountResourceIntTest {
         assertThat(testUserAccount.getText()).isEqualTo(DEFAULT_TEXT);
         assertThat(testUserAccount.getDescription()).isEqualTo(DEFAULT_DESCRIPTION);
         assertThat(testUserAccount.getType()).isEqualTo(DEFAULT_TYPE);
-
-        // Validate the UserAccount in Elasticsearch
-        UserAccount userAccountEs = userAccountSearchRepository.findOne(testUserAccount.getId());
-        assertThat(userAccountEs).isEqualToComparingFieldByField(testUserAccount);
     }
 
     @Test
@@ -248,7 +239,6 @@ public class UserAccountResourceIntTest {
     public void updateUserAccount() throws Exception {
         // Initialize the database
         userAccountRepository.saveAndFlush(userAccount);
-        userAccountSearchRepository.save(userAccount);
         int databaseSizeBeforeUpdate = userAccountRepository.findAll().size();
 
         // Update the userAccount
@@ -273,10 +263,6 @@ public class UserAccountResourceIntTest {
         assertThat(testUserAccount.getText()).isEqualTo(UPDATED_TEXT);
         assertThat(testUserAccount.getDescription()).isEqualTo(UPDATED_DESCRIPTION);
         assertThat(testUserAccount.getType()).isEqualTo(UPDATED_TYPE);
-
-        // Validate the UserAccount in Elasticsearch
-        UserAccount userAccountEs = userAccountSearchRepository.findOne(testUserAccount.getId());
-        assertThat(userAccountEs).isEqualToComparingFieldByField(testUserAccount);
     }
 
     @Test
@@ -303,7 +289,6 @@ public class UserAccountResourceIntTest {
     public void deleteUserAccount() throws Exception {
         // Initialize the database
         userAccountRepository.saveAndFlush(userAccount);
-        userAccountSearchRepository.save(userAccount);
         int databaseSizeBeforeDelete = userAccountRepository.findAll().size();
 
         // Get the userAccount
@@ -311,30 +296,9 @@ public class UserAccountResourceIntTest {
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
-        // Validate Elasticsearch is empty
-        boolean userAccountExistsInEs = userAccountSearchRepository.exists(userAccount.getId());
-        assertThat(userAccountExistsInEs).isFalse();
-
         // Validate the database is empty
         List<UserAccount> userAccountList = userAccountRepository.findAll();
         assertThat(userAccountList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    public void searchUserAccount() throws Exception {
-        // Initialize the database
-        userAccountRepository.saveAndFlush(userAccount);
-        userAccountSearchRepository.save(userAccount);
-
-        // Search the userAccount
-        restUserAccountMockMvc.perform(get("/api/_search/user-accounts?query=id:" + userAccount.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(userAccount.getId().intValue())))
-            .andExpect(jsonPath("$.[*].text").value(hasItem(DEFAULT_TEXT.toString())))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION.toString())))
-            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())));
     }
 
     @Test

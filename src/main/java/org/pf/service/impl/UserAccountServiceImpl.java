@@ -4,7 +4,6 @@ import org.pf.domain.User;
 import org.pf.domain.UserAccount;
 import org.pf.repository.UserAccountRepository;
 import org.pf.repository.UserRepository;
-import org.pf.repository.search.UserAccountSearchRepository;
 import org.pf.security.SecurityUtils;
 import org.pf.service.UserAccountService;
 import org.pf.service.dto.UserAccountDTO;
@@ -19,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
-
 /**
  * Service Implementation for managing UserAccount.
  */
@@ -34,16 +31,13 @@ public class UserAccountServiceImpl implements UserAccountService{
 
     private final UserAccountMapper userAccountMapper;
 
-    private final UserAccountSearchRepository userAccountSearchRepository;
 
     private final UserRepository userRepository;
 
     public UserAccountServiceImpl(UserAccountRepository userAccountRepository, UserAccountMapper userAccountMapper,
-        UserAccountSearchRepository userAccountSearchRepository,
         UserRepository userRepository) {
         this.userAccountRepository = userAccountRepository;
         this.userAccountMapper = userAccountMapper;
-        this.userAccountSearchRepository = userAccountSearchRepository;
         this.userRepository = userRepository;
     }
 
@@ -72,7 +66,6 @@ public class UserAccountServiceImpl implements UserAccountService{
         UserAccount userAccount = userAccountMapper.toEntity(userAccountDTO);
         userAccount = userAccountRepository.save(userAccount);
         UserAccountDTO result = userAccountMapper.toDto(userAccount);
-        userAccountSearchRepository.save(userAccount);
         return result;
     }
 
@@ -129,22 +122,6 @@ public class UserAccountServiceImpl implements UserAccountService{
     public void delete(Long id) {
         log.debug("Request to delete UserAccount : {}", id);
         userAccountRepository.delete(id);
-        userAccountSearchRepository.delete(id);
-    }
-
-    /**
-     * Search for the userAccount corresponding to the query.
-     *
-     * @param query the query of the search
-     * @param pageable the pagination information
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Page<UserAccountDTO> search(String query, Pageable pageable) {
-        log.debug("Request to search for a page of UserAccounts for query {}", query);
-        Page<UserAccount> result = userAccountSearchRepository.search(queryStringQuery(query), pageable);
-        return result.map(userAccountMapper::toDto);
     }
 
     /**

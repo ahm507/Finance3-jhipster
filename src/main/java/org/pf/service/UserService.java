@@ -8,7 +8,6 @@ import org.pf.repository.AuthorityRepository;
 import org.pf.repository.CurrencyRepository;
 import org.pf.repository.PersistentTokenRepository;
 import org.pf.repository.UserRepository;
-import org.pf.repository.search.UserSearchRepository;
 import org.pf.security.AuthoritiesConstants;
 import org.pf.security.SecurityUtils;
 import org.pf.service.dto.UserDTO;
@@ -49,8 +48,6 @@ public class UserService {
 
     private final SocialService socialService;
 
-    private final UserSearchRepository userSearchRepository;
-
     private final PersistentTokenRepository persistentTokenRepository;
 
     private final AuthorityRepository authorityRepository;
@@ -60,12 +57,11 @@ public class UserService {
     private final CurrencyRepository currencyRepository;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SocialService socialService,
-        UserSearchRepository userSearchRepository, PersistentTokenRepository persistentTokenRepository,
+        PersistentTokenRepository persistentTokenRepository,
         AuthorityRepository authorityRepository, CacheManager cacheManager, CurrencyRepository currencyRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.socialService = socialService;
-        this.userSearchRepository = userSearchRepository;
         this.persistentTokenRepository = persistentTokenRepository;
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
@@ -79,7 +75,6 @@ public class UserService {
                 // activate given user for the registration key.
                 user.setActivated(true);
                 user.setActivationKey(null);
-                userSearchRepository.save(user);
                 cacheManager.getCache(USERS_CACHE).evict(user.getLogin());
                 log.debug("Activated user: {}", user);
                 return user;
@@ -134,7 +129,6 @@ public class UserService {
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
         createInitialCurrency(newUser);
-        userSearchRepository.save(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
     }
@@ -165,7 +159,6 @@ public class UserService {
         user.setActivated(true);
         userRepository.save(user);
         createInitialCurrency(user);
-        userSearchRepository.save(user);
         log.debug("Created Information for User: {}", user);
         return user;
     }
@@ -201,7 +194,6 @@ public class UserService {
                 user.setLangKey(langKey);
                 user.setImageUrl(imageUrl);
                 user.setMasterCurrency(masterCurrency);
-                userSearchRepository.save(user);
                 cacheManager.getCache(USERS_CACHE).evict(user.getLogin());
                 log.debug("Changed Information for User: {}", user);
             });
@@ -230,7 +222,6 @@ public class UserService {
                 userDTO.getAuthorities().stream()
                     .map(authorityRepository::findOne)
                     .forEach(managedAuthorities::add);
-                userSearchRepository.save(user);
                 cacheManager.getCache(USERS_CACHE).evict(user.getLogin());
                 log.debug("Changed Information for User: {}", user);
                 return user;
@@ -242,7 +233,6 @@ public class UserService {
         userRepository.findOneByLogin(login).ifPresent(user -> {
             socialService.deleteUserSocialConnection(user.getLogin());
             userRepository.delete(user);
-            userSearchRepository.delete(user);
             cacheManager.getCache(USERS_CACHE).evict(login);
             log.debug("Deleted User: {}", user);
         });
@@ -307,7 +297,6 @@ public class UserService {
         for (User user : users) {
             log.debug("Deleting not activated user {}", user.getLogin());
             userRepository.delete(user);
-            userSearchRepository.delete(user);
             cacheManager.getCache(USERS_CACHE).evict(user.getLogin());
         }
     }

@@ -4,7 +4,6 @@ import org.pf.domain.Currency;
 import org.pf.domain.User;
 import org.pf.repository.CurrencyRepository;
 import org.pf.repository.UserRepository;
-import org.pf.repository.search.CurrencySearchRepository;
 import org.pf.security.SecurityUtils;
 import org.pf.service.CurrencyService;
 import org.pf.service.dto.CurrencyDTO;
@@ -18,9 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * Service Implementation for managing Currency.
@@ -35,15 +31,12 @@ public class CurrencyServiceImpl implements CurrencyService{
 
     private final CurrencyMapper currencyMapper;
 
-    private final CurrencySearchRepository currencySearchRepository;
-
     private final UserRepository userRepository;
 
     public CurrencyServiceImpl(CurrencyRepository currencyRepository, CurrencyMapper currencyMapper,
-        UserRepository userRepository, CurrencySearchRepository currencySearchRepository) {
+        UserRepository userRepository) {
         this.currencyRepository = currencyRepository;
         this.currencyMapper = currencyMapper;
-        this.currencySearchRepository = currencySearchRepository;
         this.userRepository = userRepository;
     }
 
@@ -61,7 +54,6 @@ public class CurrencyServiceImpl implements CurrencyService{
         Currency currency = currencyMapper.toEntity(currencyDTO);
         currency = currencyRepository.save(currency);
         CurrencyDTO result = currencyMapper.toDto(currency);
-        currencySearchRepository.save(currency);
         return result;
     }
 
@@ -128,24 +120,8 @@ public class CurrencyServiceImpl implements CurrencyService{
     public void delete(Long id) {
         log.debug("Request to delete Currency : {}", id);
         currencyRepository.delete(id);
-        currencySearchRepository.delete(id);
     }
 
-    /**
-     * Search for the currency corresponding to the query.
-     *
-     * @param query the query of the search
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<CurrencyDTO> search(String query) {
-        log.debug("Request to search Currencies for query {}", query);
-        return StreamSupport
-            .stream(currencySearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .map(currencyMapper::toDto)
-            .collect(Collectors.toList());
-    }
 
     public boolean isDuplicateName(String login, String name) {
         if(login == null) { //Works with WEB ONLY - NOT TEST CASES. In Test cases, you must pass login parameter

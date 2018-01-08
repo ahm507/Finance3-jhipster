@@ -1,9 +1,8 @@
 package org.pf.service.impl;
 
-import org.pf.service.UserSettingsService;
 import org.pf.domain.UserSettings;
 import org.pf.repository.UserSettingsRepository;
-import org.pf.repository.search.UserSettingsSearchRepository;
+import org.pf.service.UserSettingsService;
 import org.pf.service.dto.UserSettingsDTO;
 import org.pf.service.mapper.UserSettingsMapper;
 import org.slf4j.Logger;
@@ -14,9 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * Service Implementation for managing UserSettings.
@@ -31,12 +27,10 @@ public class UserSettingsServiceImpl implements UserSettingsService{
 
     private final UserSettingsMapper userSettingsMapper;
 
-    private final UserSettingsSearchRepository userSettingsSearchRepository;
-
-    public UserSettingsServiceImpl(UserSettingsRepository userSettingsRepository, UserSettingsMapper userSettingsMapper, UserSettingsSearchRepository userSettingsSearchRepository) {
+    public UserSettingsServiceImpl(UserSettingsRepository userSettingsRepository,
+        UserSettingsMapper userSettingsMapper) {
         this.userSettingsRepository = userSettingsRepository;
         this.userSettingsMapper = userSettingsMapper;
-        this.userSettingsSearchRepository = userSettingsSearchRepository;
     }
 
     /**
@@ -51,7 +45,6 @@ public class UserSettingsServiceImpl implements UserSettingsService{
         UserSettings userSettings = userSettingsMapper.toEntity(userSettingsDTO);
         userSettings = userSettingsRepository.save(userSettings);
         UserSettingsDTO result = userSettingsMapper.toDto(userSettings);
-        userSettingsSearchRepository.save(userSettings);
         return result;
     }
 
@@ -92,22 +85,6 @@ public class UserSettingsServiceImpl implements UserSettingsService{
     public void delete(Long id) {
         log.debug("Request to delete UserSettings : {}", id);
         userSettingsRepository.delete(id);
-        userSettingsSearchRepository.delete(id);
     }
 
-    /**
-     * Search for the userSettings corresponding to the query.
-     *
-     * @param query the query of the search
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public List<UserSettingsDTO> search(String query) {
-        log.debug("Request to search UserSettings for query {}", query);
-        return StreamSupport
-            .stream(userSettingsSearchRepository.search(queryStringQuery(query)).spliterator(), false)
-            .map(userSettingsMapper::toDto)
-            .collect(Collectors.toList());
-    }
 }

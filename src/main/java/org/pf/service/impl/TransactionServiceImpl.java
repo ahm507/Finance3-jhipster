@@ -7,15 +7,12 @@ import org.pf.domain.enumeration.AccountType;
 import org.pf.repository.TransactionRepository;
 import org.pf.repository.UserAccountRepository;
 import org.pf.repository.UserRepository;
-import org.pf.repository.search.TransactionSearchRepository;
 import org.pf.security.SecurityUtils;
 import org.pf.service.TransactionService;
 import org.pf.service.dto.TransactionDTO;
 import org.pf.service.mapper.TransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +23,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * Service Implementation for managing Transaction.
@@ -44,18 +39,15 @@ public class TransactionServiceImpl implements TransactionService{
 
     private final TransactionMapper transactionMapper;
 
-    private final TransactionSearchRepository transactionSearchRepository;
-
     private final UserRepository userRepository;
 
     private final UserAccountRepository userAccountRepository;
 
     public TransactionServiceImpl(TransactionRepository transactionRepository, TransactionMapper transactionMapper,
-        TransactionSearchRepository transactionSearchRepository, UserRepository userRepository,
+        UserRepository userRepository,
         UserAccountRepository userAccountRepository) {
         this.transactionRepository = transactionRepository;
         this.transactionMapper = transactionMapper;
-        this.transactionSearchRepository = transactionSearchRepository;
         this.userRepository = userRepository;
         this.userAccountRepository = userAccountRepository;
     }
@@ -72,7 +64,6 @@ public class TransactionServiceImpl implements TransactionService{
         enforceSavingToCurrentUser(transactionDTO);
         Transaction transaction = transactionMapper.toEntity(transactionDTO);
         transaction = transactionRepository.save(transaction);
-        transactionSearchRepository.save(transaction);
         return transactionMapper.toDto(transaction);
     }
 
@@ -142,23 +133,7 @@ public class TransactionServiceImpl implements TransactionService{
     public void delete(Long id) {
         log.debug("Request to delete Transaction : {}", id);
         transactionRepository.delete(id);
-        transactionSearchRepository.delete(id);
     }
-
-    /**
-     * Search for the transaction corresponding to the query.
-     *
-     * @param query the query of the search
-     * @return the list of entities
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public Page<TransactionDTO> search(String query, Pageable pageable) {
-        log.debug("Request to search for a page of Transactions for query {}", query);
-        Page<Transaction> result = transactionSearchRepository.search(queryStringQuery(query), pageable);
-        return result.map(transactionMapper::toDto);
-    }
-
 
     private int getDepositSign(AccountType type) {
         switch (type) {
@@ -299,6 +274,9 @@ public class TransactionServiceImpl implements TransactionService{
 
     public List<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year) {
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
+        if(userAccount == null) {
+            return new ArrayList<TransactionDTO>();
+        }
         if(userAccount.getType() == AccountType.ASSET || userAccount.getType() == AccountType.LIABILITY) {
             return findYearTransactionsForAssetAndLiability(login, userAccountId, year);
         }
@@ -315,8 +293,6 @@ public class TransactionServiceImpl implements TransactionService{
 
     public void deleteAllByUser(String login) {
         transactionRepository.deleteByUser_Login(login);
-        transactionSearchRepository.deleteByUser_Login(login);
-
     }
 
 }
