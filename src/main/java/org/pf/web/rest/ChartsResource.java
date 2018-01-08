@@ -55,6 +55,7 @@ public class ChartsResource {
 
     }
 
+    //http://localhost:8080/api/importing/path=/Users/Macpro/Projects/pf-jhipster4/pf-backup-2018-01-08.csv
     @GetMapping("/importing")
     @Timed
     public List<String> importing(
@@ -63,9 +64,7 @@ public class ChartsResource {
 
         log.info("Importing old database");
         if(filePath == null) filePath = "/Users/Macpro/Projects/pf-jhipster4/pf-backup-2017-12-27.csv";
-        List<String> out = restoreService.importFile("user", filePath);
-        return out;
-
+        return restoreService.importFile("user", filePath);
     }
 
 
