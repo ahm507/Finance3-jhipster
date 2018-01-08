@@ -31,8 +31,8 @@ import java.util.Optional;
 @Transactional
 public class TransactionServiceImpl implements TransactionService{
 
-    public static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
-    public static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
+    private static final String YYYY_MM_DD_HH_MM_SS_S = "yyyy-MM-dd HH:mm:ss.S";
+    private static final String END_OF_MONTH_STRING = "-12-31 23:59:59.0";
     private final Logger log = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     private final TransactionRepository transactionRepository;
@@ -201,7 +201,6 @@ public class TransactionServiceImpl implements TransactionService{
             int minYear = minDate.getYear();
             int maxYear = maxDate.getYear();
             ArrayList<String> years = new ArrayList<>();
-            //FIXME: How come year list includes one space string " "
             years.add(" "); //All years, means no filter
             for(int y = minYear; y <= maxYear; y++) {
                 years.add(String.valueOf(y));
@@ -275,7 +274,7 @@ public class TransactionServiceImpl implements TransactionService{
     public List<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year) {
         UserAccount userAccount = userAccountRepository.findOne(userAccountId);
         if(userAccount == null) {
-            return new ArrayList<TransactionDTO>();
+            return new ArrayList<>();
         }
         if(userAccount.getType() == AccountType.ASSET || userAccount.getType() == AccountType.LIABILITY) {
             return findYearTransactionsForAssetAndLiability(login, userAccountId, year);

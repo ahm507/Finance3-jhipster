@@ -65,8 +65,7 @@ public class UserAccountServiceImpl implements UserAccountService{
         enforceSavingToCurrentUser(userAccountDTO);
         UserAccount userAccount = userAccountMapper.toEntity(userAccountDTO);
         userAccount = userAccountRepository.save(userAccount);
-        UserAccountDTO result = userAccountMapper.toDto(userAccount);
-        return result;
+        return userAccountMapper.toDto(userAccount);
     }
 
     /**
@@ -82,7 +81,7 @@ public class UserAccountServiceImpl implements UserAccountService{
         }
         Optional<User> user = userRepository.findOneByLogin(login);
         long accountsCount = userAccountRepository.countByUser_IdAndText(user.get().getId(), accountText);
-        return ( accountsCount > 0)? true: false;
+        return ( accountsCount > 0);
     }
 
     /**

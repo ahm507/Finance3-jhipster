@@ -53,8 +53,7 @@ public class CurrencyServiceImpl implements CurrencyService{
         enforceSavingToCurrentUser(currencyDTO);
         Currency currency = currencyMapper.toEntity(currencyDTO);
         currency = currencyRepository.save(currency);
-        CurrencyDTO result = currencyMapper.toDto(currency);
-        return result;
+        return  currencyMapper.toDto(currency);
     }
 
     private void enforceSavingToCurrentUser(CurrencyDTO currencyDTO) {
@@ -82,13 +81,6 @@ public class CurrencyServiceImpl implements CurrencyService{
             .map(currencyMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
-
-
-    //THIS API FAIL AT TEST, because of SecurityUtils.getCurrentUserLogin() failure.
-//    public List<CurrencyDTO> findAllByCurrentUser() {
-//        Optional<String> login = SecurityUtils.getCurrentUserLogin();
-//        return findAllByCurrentUser(login.get());
-//    }
 
     public List<CurrencyDTO> findAllByCurrentUser(String login) {
         log.debug("Request to get all Currencies");

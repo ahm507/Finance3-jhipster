@@ -79,7 +79,7 @@ public class ChartsResourceIntTest {
 //
 //        return null;
 //    }
-    User user;
+    private User user;
 
     @Before
     public void initTest() {
@@ -192,7 +192,7 @@ public class ChartsResourceIntTest {
 
     @Test
     @Transactional
-    public void charts() throws Exception {
+    public void charts() {
 
         String html = chartsService.getTransactionsTrendHtml("2017", "ASSET", user.getLogin());
         assertThat(html)

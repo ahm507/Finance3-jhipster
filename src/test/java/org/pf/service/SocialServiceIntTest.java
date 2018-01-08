@@ -66,7 +66,7 @@ public class SocialServiceIntTest {
     }
 
     @Test
-    public void testDeleteUserSocialConnection() throws Exception {
+    public void testDeleteUserSocialConnection() {
         // Setup
         Connection<?> connection = createConnection("@LOGIN",
             "mail@mail.com",

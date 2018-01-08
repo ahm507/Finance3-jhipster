@@ -44,8 +44,7 @@ public class UserSettingsServiceImpl implements UserSettingsService{
         log.debug("Request to save UserSettings : {}", userSettingsDTO);
         UserSettings userSettings = userSettingsMapper.toEntity(userSettingsDTO);
         userSettings = userSettingsRepository.save(userSettings);
-        UserSettingsDTO result = userSettingsMapper.toDto(userSettings);
-        return result;
+        return userSettingsMapper.toDto(userSettings);
     }
 
     /**

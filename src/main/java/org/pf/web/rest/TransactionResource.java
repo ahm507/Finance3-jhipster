@@ -100,22 +100,6 @@ public class TransactionResource {
     /**
      * GET  /transactions : get all the transactions.
      *
-     * @param pageable the pagination information
-     * @return the ResponseEntity with status 200 (OK) and the list of transactions in body
-     */
-//    @GetMapping("/transactions")
-//    @Timed
-//    public ResponseEntity<List<TransactionDTO>> getAllTransactions(Pageable pageable) {
-//        log.debug("REST request to get a page of Transactions");
-//        Page<TransactionDTO> page = transactionService.findAllByCurrentUser(pageable);
-//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
-//        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
-//    }
-
-
-    /**
-     * GET  /transactions : get all the transactions.
-     *
      * @return the ResponseEntity with status 200 (OK) and the list of transactions in body
      */
     @GetMapping("/transactions")
@@ -140,10 +124,7 @@ public class TransactionResource {
             //both are not null
             page = transactionService.findYearTransactions(login, userAccountId, year);
         }
-        //log.debug("Getting transactions for userAccountID=" + userAccountId + ", count=" + page.getTotalElements());
         log.debug("Getting transactions for userAccountID={0}, count={1}" ,userAccountId, page.size());
-//        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(page, "/api/transactions");
-//        return new ResponseEntity<>(page, headers, HttpStatus.OK);
         return page;
     }
 

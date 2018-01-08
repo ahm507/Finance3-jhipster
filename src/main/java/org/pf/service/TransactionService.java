@@ -25,7 +25,7 @@ public interface TransactionService {
      */
     List<TransactionDTO> findAll();
 
-    public List<TransactionDTO> findByUserLoginAndAccountId(String lgin, long userAccountId);
+    List<TransactionDTO> findByUserLoginAndAccountId(String lgin, long userAccountId);
 
     /**
      * Get the "id" transaction.
@@ -42,9 +42,9 @@ public interface TransactionService {
      */
     void delete(Long id);
 
-    public List<String> getYearList(String login);
+    List<String> getYearList(String login);
 
-    public List<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year);
+    List<TransactionDTO> findYearTransactions(String login, Long userAccountId, Long year);
 
     boolean isInvalidCurrencies(TransactionDTO transactionDTO);
 
