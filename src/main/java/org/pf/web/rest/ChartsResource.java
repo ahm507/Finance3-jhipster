@@ -43,11 +43,11 @@ public class ChartsResource {
     public String getAllCharts(
         @RequestParam(required = false, value = "login") String login,
         @RequestParam(required = false, value = "type") String type,
-        @RequestParam(required = false, value = "year") String year ) throws Exception {
+        @RequestParam(required = false, value = "year") String year ) {
 
         log.debug("REST request to get all Charts");
 
-        if(login == null) {
+        if(login == null && SecurityUtils.getCurrentUserLogin().isPresent()) {
             login = SecurityUtils.getCurrentUserLogin().get();
         }
 
@@ -60,10 +60,9 @@ public class ChartsResource {
     @Timed
     public List<String> importing(
         @RequestParam(required = false, value = "login") String login,
-        @RequestParam(required = false, value = "path") String filePath) throws Exception {
+        @RequestParam(required = true, value = "path") String filePath) throws org.pf.service.RestoreException, java.io.IOException {
 
         log.info("Importing old database");
-        if(filePath == null) filePath = "/Users/Macpro/Projects/pf-jhipster4/pf-backup-2017-12-27.csv";
         return restoreService.importFile("user", filePath);
     }
 
