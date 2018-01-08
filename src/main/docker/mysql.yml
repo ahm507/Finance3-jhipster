@@ -1,9 +1,9 @@
 version: '2'
 services:
     finance-mysql:
-        image: mysql:5.7.20
-        # volumes:
-        #     - ~/volumes/jhipster/finance/mysql/:/var/lib/mysql/
+        image: mysql:5.7
+        volumes:
+            - ~/finance4-mysql-volume/:/var/lib/mysql
         environment:
             - MYSQL_USER=root
             - MYSQL_ALLOW_EMPTY_PASSWORD=yes
