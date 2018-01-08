@@ -26,15 +26,13 @@ import java.util.Set;
 @Transactional
 public class ChartsService {
 
-    public static final String MONTH = "Month";
-    public static final String TOTAL = "Total";
-    static final String CAT_INCOME = "INCOME";
-    static final String CAT_LIABILITY = "LIABILITY";
-    static final String CAT_EXPENSE = "EXPENSE";
-    static final String CAT_ASSET = "ASSET";
-    static final String CAT_OTHER = "OTHER";
-
-    static final String TOTALS = "totals";
+    private static final String MONTH = "Month";
+    private static final String TOTAL = "Total";
+    private static final String CAT_INCOME = "INCOME";
+    private static final String CAT_LIABILITY = "LIABILITY";
+    private static final String CAT_EXPENSE = "EXPENSE";
+    private static final String CAT_ASSET = "ASSET";
+    private static final String CAT_OTHER = "OTHER";
 
     private TransactionService transactionService;
     private UserAccountRepository userAccountRepository;
@@ -79,7 +77,7 @@ public class ChartsService {
     private void convertHeaderHtml(StringBuilder stringBuilder, Set<String> keys) {
         stringBuilder.append("<tr>");
         for(String key : keys) {
-            stringBuilder.append("<td>" + key + "</td>");
+            stringBuilder.append("<td>").append(key).append("</td>");
         }
         stringBuilder.append("</tr>\r\n");
     }
@@ -87,7 +85,14 @@ public class ChartsService {
     private void convertRowHtml(StringBuilder stringBuilder, Map<String, Object> map, Set<String> keys) {
         stringBuilder.append("<tr>");
         for(String key : keys) {
-            stringBuilder.append("<td>" + map.get(key) + "</td>");
+            Object value = map.get(key);
+            String strValue;
+            if(value instanceof Double) {
+                strValue = org.pf.service.impl.TransactionServiceImpl.formatMoney((Double)value);
+            } else {
+                strValue = value.toString();
+            }
+            stringBuilder.append("<td>").append(strValue).append("</td>");
         }
         stringBuilder.append("</tr>\r\n");
     }
