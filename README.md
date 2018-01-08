@@ -237,3 +237,13 @@ Build image and tag it
     
     sudo docker image build -t finance:latest .
     
+Install Tomcat:
+    sudo apt-get install tomcat8
+    
+    sudo service tomcat8 restart
+
+Allow port 8080:    
+    
+    gcloud compute firewall-rules create allow-tomcat83 --allow tcp:8080 --source-tags=instance-1 --source-ranges=0.0.0.0/0 --description="enable 8080"
+    
+    

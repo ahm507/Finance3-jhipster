@@ -11,7 +11,7 @@
 
         return $resource(resourceUrl, {}, {
             'query': { method: 'GET', isArray: true},
-            'queryYears': { method: 'GET', url:'/api/transactions/yearList', isArray: true},
+            'queryYears': { method: 'GET', url:'api/transactions/yearList', isArray: true},
             'get': {
                 method: 'GET',
                 transformResponse: function (data) {
