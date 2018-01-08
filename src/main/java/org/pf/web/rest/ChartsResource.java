@@ -47,7 +47,8 @@ public class ChartsResource {
 
         log.debug("REST request to get all Charts");
 
-        if(login == null && SecurityUtils.getCurrentUserLogin().isPresent()) {
+        if(login == null) {
+//             && SecurityUtils.getCurrentUserLogin().isPresent()
             login = SecurityUtils.getCurrentUserLogin().get();
         }
 
