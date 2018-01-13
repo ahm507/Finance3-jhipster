@@ -1,7 +1,9 @@
-# finance
+# Personal Finance
 This application was generated using JHipster 4.11.1, you can find documentation and help at [http://www.jhipster.tech/documentation-archive/v4.11.1](http://www.jhipster.tech/documentation-archive/v4.11.1).
 
 ## Development
+
+<img href="https://travis-ci.org/ahm507/Finance3.svg?branch=master">
 
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
