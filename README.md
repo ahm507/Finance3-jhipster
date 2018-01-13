@@ -3,7 +3,7 @@ This application was generated using JHipster 4.11.1, you can find documentation
 
 ## Development
 
-<img href="https://travis-ci.org/ahm507/Finance3.svg?branch=master">
+![Build Status](https://travis-ci.org/ahm507/Finance3.svg?branch=master)
 
 Before you can build this project, you must install and configure the following dependencies on your machine:
 
