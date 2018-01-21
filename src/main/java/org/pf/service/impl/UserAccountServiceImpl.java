@@ -144,7 +144,7 @@ public class UserAccountServiceImpl implements UserAccountService{
         if(login == null) { //Web Interface ONLY (TEST cases will fail)
             login = SecurityUtils.getCurrentUserLogin().get();
         }
-        return userAccountMapper.toDto(userAccountRepository.findByUser_LoginOrderByTypeAsc(login));
+        return userAccountMapper.toDto(userAccountRepository.findByUser_LoginOrderByTypeAscText(login));
     }
 
 }
