@@ -18,6 +18,16 @@
         vm.users = User.query();
         vm.useraccounts = UserAccount.queryAsList();
 
+
+        //Get default selections
+        if (vm.transaction.id === null) { //New Transaction and not ediing an existing one
+            vm.transaction.withdrawAccountId = parseInt(localStorage.getItem("selected_withdrawAccountId"));
+            vm.transaction.depositAccountId = parseInt(localStorage.getItem("selected_depositAccountId"));
+        } else { //Edit Transaction
+            //Store selection
+            storeDefaults();
+        }
+
         //initiate date control to today now.
         if( vm.transaction.date == null) {
             vm.transaction.date = new Date();
@@ -53,6 +63,8 @@
             } else {
                 Transaction.save(vm.transaction, onSaveSuccess, onSaveError);
             }
+            //Store selection
+            storeDefaults();
         }
 
         function onSaveSuccess (result) {
@@ -69,6 +81,11 @@
 
         function openCalendar (date) {
             vm.datePickerOpenStatus[date] = true;
+        }
+
+        function storeDefaults() {
+            localStorage.setItem("selected_withdrawAccountId", vm.transaction.withdrawAccountId);
+            localStorage.setItem("selected_depositAccountId", vm.transaction.depositAccountId);
         }
     }
 })();
