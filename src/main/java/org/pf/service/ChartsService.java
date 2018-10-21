@@ -117,8 +117,8 @@ public class ChartsService {
         stringBuilder.append("</tr>\r\n");
     }
 
-    String formatMoney(double value) {
-        return org.pf.service.impl.TransactionServiceImpl.formatMoney((Double) value);
+    private String formatMoney(double value) {
+        return org.pf.service.impl.TransactionServiceImpl.formatMoney(value);
     }
 
     private List<Map<String,Object>> getTrendDataForAllYears(String login) {
@@ -313,7 +313,10 @@ public class ChartsService {
     private List<Map<String, Object>> getDataSummation(String login, String year, String type) {
         List<Map<String, Object>> out = new ArrayList<>();
         //for all months
-        List<UserAccount> accs = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, AccountType.valueOf(type));
+        List<UserAccount> accounts = userAccountRepository.findByUser_LoginAndTypeOrderByText(login, AccountType.valueOf(type));
+        Map<String, Object> yearTotals = new HashMap<>();
+        double grandTotal = 0;
+        yearTotals.put(MONTH, "TOTALS");
         for (int month = 1; month <= 12; month++) {
             //get month transaction
             //List<TransactionDTO> trans = transactionService.getYearMonthTransactions(login, year, month); //for all accounts
@@ -324,16 +327,23 @@ public class ChartsService {
             HashMap<String, Object> map = new HashMap<>();
             map.put(MONTH, getMonthName(month));
             double monthTotal = 0;
-            for (UserAccount a : accs) {
-                double balance = transactionService.computeBalance(a.getId(), a.getType(), 0, trans);
-                double rate = a.getCurrency().getConversionRate();
+            for (UserAccount account : accounts) {
+                double balance = transactionService.computeBalance(account.getId(), account.getType(), 0, trans);
+                double rate = account.getCurrency().getConversionRate();
                 balance *= rate;
-                map.put(a.getText(), balance);
+                map.put(account.getText(), balance);
                 monthTotal += balance;
+
+                //Compute YearTotal
+                yearTotals.putIfAbsent(account.getText(), 0.00);
+                yearTotals.put(account.getText(), (double)yearTotals.get(account.getText()) + balance);
             }
             map.put(TOTAL, monthTotal);
+            grandTotal += monthTotal;
             out.add(map);
         }
+        yearTotals.put(TOTAL, grandTotal);
+        out.add(yearTotals);
         return out;
     }
 
