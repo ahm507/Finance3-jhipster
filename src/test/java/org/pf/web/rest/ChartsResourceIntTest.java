@@ -199,10 +199,11 @@ public class ChartsResourceIntTest {
             .isNotEmpty()
             .contains("<tr><td>Feb</td><td>-500.00</td><td>-500.00</td></tr>");
 
+        //All years
         html = chartsService.getTransactionsTrendHtml("", "", user.getLogin());
         assertThat(html)
             .isNotEmpty()
-            .contains("<tr><td>-2,000.00</td><td>2017</td><td>-200.00</td><td>300.00</td><td>100.00</td><td>-500.00</td></tr>");
+            .contains("<tr><td>2017</td><td>-2,000.00</td><td>-200.00</td><td>300.00</td><td>100.00</td><td>-500.00</td><td> </td></tr>");
 
         html = chartsService.getTransactionsTrendHtml("2017", "EXPENSE", user.getLogin());
         assertThat(html)
@@ -240,6 +241,8 @@ public class ChartsResourceIntTest {
 //        Charts chartsEs = chartsSearchRepository.findOne(testCharts.getId());
 //        assertThat(chartsEs).isEqualToComparingFieldByField(testCharts);
     }
+
+
 
 
 }

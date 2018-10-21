@@ -62,6 +62,7 @@ public class ChartsService {
         boolean headerRendered = false;
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("<table border=\"1\">");
+//        convertHeaderHtml(stringBuilder, data.get(0).keySet());
         for(Map<String, Object> map : data) {
             Set<String> keys = map.keySet();
             if( ! headerRendered) {
@@ -76,25 +77,48 @@ public class ChartsService {
 
     private void convertHeaderHtml(StringBuilder stringBuilder, Set<String> keys) {
         stringBuilder.append("<tr>");
+        stringBuilder.append("<td>").append("Year/Month").append("</td>");
         for(String key : keys) {
-            stringBuilder.append("<td>").append(key).append("</td>");
+            if(! key.equals("Month") && ! key.equals("Total")) {
+                stringBuilder.append("<td>").append(key).append("</td>");
+            }
         }
+        stringBuilder.append("<td>").append("Total").append("</td>");
+
         stringBuilder.append("</tr>\r\n");
     }
 
     private void convertRowHtml(StringBuilder stringBuilder, Map<String, Object> map, Set<String> keys) {
         stringBuilder.append("<tr>");
+        //Add first value
+        stringBuilder.append("<td>").append(map.get("Month")).append("</td>");
         for(String key : keys) {
-            Object value = map.get(key);
-            String strValue;
-            if(value instanceof Double) {
-                strValue = org.pf.service.impl.TransactionServiceImpl.formatMoney((Double)value);
-            } else {
-                strValue = value.toString();
+            if(! key.equals("Month") && ! key.equals("Total")) {
+               Object value = map.get(key);
+                String strValue;
+                if (value instanceof Double) {
+                    strValue = formatMoney((Double) value);
+                } else {
+                    strValue = value.toString();
+                }
+                stringBuilder.append("<td>").append(strValue).append("</td>");
             }
-            stringBuilder.append("<td>").append(strValue).append("</td>");
         }
+
+        //Add last value of Totals
+        Object value = map.get("Total");
+        if(value != null) { //null in case of all years data
+            String strValue = formatMoney((Double) value);
+            stringBuilder.append("<td>").append(strValue).append("</td>");
+        } else {
+            stringBuilder.append("<td>").append(" ").append("</td>");
+        }
+
         stringBuilder.append("</tr>\r\n");
+    }
+
+    String formatMoney(double value) {
+        return org.pf.service.impl.TransactionServiceImpl.formatMoney((Double) value);
     }
 
     private List<Map<String,Object>> getTrendDataForAllYears(String login) {

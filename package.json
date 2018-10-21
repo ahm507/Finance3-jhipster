@@ -64,5 +64,8 @@
   },
   "scripts": {
     "test": "gulp test"
+  },
+  "dependencies": {
+    "npm": "^6.3.0"
   }
 }
