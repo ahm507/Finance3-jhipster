@@ -125,9 +125,10 @@ public class ChartsService {
         Map<String, Map<String, Object>> out = getTotalsAllYearsAllAccountTypes(login);
         List<Map<String, Object>> out2 = new ArrayList<>();
         //convert map to array for html/JS compatibility
-        Set<String> keys = out.keySet();
-        for(String key : keys) {
-            out2.add(out.get(key));
+        List<String> years = transactionService.getYearList(login);
+        years.remove(0);
+        for (String yearString : years) {
+            out2.add(out.get(yearString));
         }
         return out2;
     }
