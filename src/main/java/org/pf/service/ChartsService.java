@@ -55,7 +55,38 @@ public class ChartsService {
         } else {
             out2 = getTrendData(login, year, type);
         }
+
+        removeZeroColumns(out2);
+
         return convertToHtml(out2);
+    }
+
+    public void removeZeroColumns(List<Map<String, Object>> data) {
+
+        if(data.size() < 1) return;
+
+        Map<String, Object> first = data.get(0);
+        //WARNING: You can NOT iterate over KeySet directly and do any modifications,
+        //because ConcurrentModificationException is thrown
+        String[] keys = first.keySet().toArray(new String[1]);
+        for(String key : keys) {
+            if(! key.equals("Month") && ! key.equals("Total") ) { //Title keys
+                if (areAllKeysZeros(key, data)) removeAllKeyValues(key, data);//keysToRemove.add(key);
+            }
+        }
+    }
+
+    private boolean areAllKeysZeros(String key, List<Map<String, Object>> data) {
+        for(Map<String, Object> row : data) {
+            if((Double)row.get(key) != 0.0) return false;
+        }
+        return true;
+    }
+
+    private void removeAllKeyValues(String key, List<Map<String, Object>> data) {
+        for(Map<String, Object> row : data) {
+            row.remove(key);
+        }
     }
 
     private String convertToHtml(List<Map<String, Object>> data) {
